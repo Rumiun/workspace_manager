@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "我的",
+  "usingComponents": {
+    "pc-shell": "/components/pc-shell/index"
+  }
+}

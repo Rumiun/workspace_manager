@@ -1,0 +1,6 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "pc-shell": "/components/pc-shell/index"
+  }
+}

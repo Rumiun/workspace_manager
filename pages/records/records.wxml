@@ -1,0 +1,33 @@
+<pc-shell nav="records" title="申请记录">
+<view class="page {{isWide ? 'pc' : ''}}">
+  <view class="tabs">
+    <view class="tab {{tab === item.key ? 'active' : ''}}" wx:for="{{tabs}}" wx:key="key" data-tab="{{item.key}}" bindtap="switchTab">
+      {{item.label}}
+    </view>
+  </view>
+
+  <view class="card" wx:for="{{apps}}" wx:key="id">
+    <view class="row">
+      <view class="app-code">{{item.seatCode}}</view>
+      <text class="tag {{item.tagClass}}">{{item.statusText}}</text>
+    </view>
+    <view class="kv">
+      <text class="text-sub">申请时间</text>
+      <text>{{item.applyTime}}</text>
+    </view>
+    <view class="kv">
+      <text class="text-sub">使用期限</text>
+      <text>{{item.startDate}} 至 {{item.endDate}}</text>
+    </view>
+    <view class="kv" wx:if="{{item.handler}}">
+      <text class="text-sub">审批人</text>
+      <text>{{item.handler}} · {{item.handleTime}}</text>
+    </view>
+    <view class="reason" wx:if="{{item.reason}}">申请理由：{{item.reason}}</view>
+    <view class="comment" wx:if="{{item.comment}}">审批意见：{{item.comment}}</view>
+    <view class="btn plain mt-24" wx:if="{{item.status === 'pending'}}" data-id="{{item.id}}" bindtap="cancelApp">撤回申请</view>
+  </view>
+
+  <view class="empty" wx:if="{{!apps.length}}">暂无相关申请记录</view>
+</view>
+</pc-shell>

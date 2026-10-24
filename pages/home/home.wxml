@@ -1,0 +1,203 @@
+<pc-shell nav="home" title="首页概览">
+<view class="page home {{isWide ? 'pc' : ''}}">
+  <view class="pc-hint" wx:if="{{isPC}}">电脑端视图：内容居中显示，常用入口集中在下方快捷功能。</view>
+  <!-- 用户信息头部 -->
+  <view class="hero {{isAdmin ? 'has-switch' : ''}}">
+    <!-- 管理员：右上角下拉切换后台视图（手机版 / 电脑版），原地生效，不新开页面层级 -->
+    <block wx:if="{{isAdmin}}">
+      <view class="hero-mask" wx:if="{{uiMenuOpen}}" catchtap="closeUiMenu"></view>
+      <view class="hero-switch" catchtap="toggleUiMenu">
+        <text>{{uiPc ? '电脑版' : '手机版'}}</text>
+        <text class="hero-caret {{uiMenuOpen ? 'up' : ''}}">▾</text>
+      </view>
+      <view class="hero-menu" wx:if="{{uiMenuOpen}}">
+        <view class="hero-menu-item {{uiPc ? '' : 'on'}}" catchtap="usePhoneUI">
+          <text class="hero-menu-title">手机版页面</text>
+          <text class="hero-menu-tip">默认：与手机端一致</text>
+        </view>
+        <view class="hero-menu-item {{uiPc ? 'on' : ''}}" catchtap="usePcUI">
+          <text class="hero-menu-title">电脑版页面</text>
+          <text class="hero-menu-tip">左侧导航 + 全屏画布</text>
+        </view>
+      </view>
+    </block>
+    <view class="hero-row">
+      <view class="avatar">{{user.name}}</view>
+      <view class="grow">
+        <view class="hero-name">
+          {{user.name}}
+          <text class="role-tag">{{isAdmin ? '管理员' : '研究生'}}</text>
+        </view>
+        <view class="hero-sub">{{user.college}}</view>
+        <view class="hero-sub" wx:if="{{!isAdmin}}">{{user.grade}} · 导师 {{user.tutor}}</view>
+      </view>
+    </view>
+    <view class="hero-id">{{isAdmin ? '工号' : '学号'}} {{user.id}}</view>
+  </view>
+
+  <!-- 学生：我的工位 -->
+  <view class="cols">
+  <view class="card" wx:if="{{!isAdmin}}">
+    <view class="card-title">
+      我的工位
+      <text class="more" bindtap="goMySeat">{{mySeat ? '工位地图 ›' : '去登记 ›'}}</text>
+    </view>
+    <block wx:if="{{mySeat}}">
+      <view class="seat-hero">
+        <view class="seat-code">{{mySeat.code}}</view>
+        <view class="seat-zone">{{mySeat.zoneName}} · 第 {{mySeat.row}} 排 第 {{mySeat.col}} 座</view>
+      </view>
+      <view class="kv">
+        <text class="text-sub">归属状态</text>
+        <text class="tag success">已登记</text>
+      </view>
+      <view class="kv">
+        <text class="text-sub">登记时间</text>
+        <text>{{mySeat.claimedAt || '—'}}</text>
+      </view>
+      <view class="kv">
+        <text class="text-sub">配套设施</text>
+        <text>{{seatFacility}}</text>
+      </view>
+    </block>
+    <view wx:else class="no-seat">
+      <view class="no-seat-text">当前暂无工位，扫描工位上的固定二维码即可登记归属</view>
+      <view class="btn ghost mt-16" bindtap="goScan">扫码登记工位</view>
+    </view>
+  </view>
+
+  <!-- 扫码登记入口 -->
+  <view class="card" wx:if="{{!isAdmin}}">
+    <view class="card-title">
+      工位登记
+      <text class="more" bindtap="showQrRule">二维码规则 ›</text>
+    </view>
+    <view class="quick">
+      <view class="quick-item" bindtap="goScan">
+        <view class="qi-icon blue">扫</view>
+        <text>扫码登记</text>
+      </view>
+      <view class="quick-item" bindtap="goRegister">
+        <view class="qi-icon green">号</view>
+        <text>输入工位号</text>
+      </view>
+      <view class="quick-item" bindtap="goSeat">
+        <view class="qi-icon purple">图</view>
+        <text>工位地图</text>
+      </view>
+    </view>
+    <view class="small text-weak mt-16">一工位一归属：工位登记成功后，其他同学扫码将无法重复登记</view>
+  </view>
+  </view>
+
+  <!-- 管理员：数据概览 -->
+  <view class="cols">
+  <view class="card" wx:if="{{isAdmin}}">
+    <view class="card-title">
+      工位概览
+      <text class="more" bindtap="goRegister">登记管理 ›</text>
+    </view>
+    <view class="stat-grid">
+      <view class="stat-cell">
+        <view class="stat-num">{{stats.total}}</view>
+        <view class="stat-label">工位总数</view>
+      </view>
+      <view class="stat-cell">
+        <view class="stat-num text-primary">{{stats.used}}</view>
+        <view class="stat-label">已登记</view>
+      </view>
+      <view class="stat-cell">
+        <view class="stat-num text-success">{{stats.free}}</view>
+        <view class="stat-label">空闲</view>
+      </view>
+      <view class="stat-cell">
+        <view class="stat-num text-danger">{{stats.repair}}</view>
+        <view class="stat-label">停用</view>
+      </view>
+    </view>
+    <view class="rate-bar">
+      <view class="rate-inner" style="width: {{stats.rate}}%"></view>
+    </view>
+    <view class="small text-weak mt-16">当前工位登记率 {{stats.rate}}%</view>
+    <view class="btn block mt-24" bindtap="goAdmin">进入工位管理后台</view>
+  </view>
+
+
+  <!-- 待办 -->
+  <view class="card" wx:if="{{pendingCount > 0}}">
+    <view class="card-title">待办事项</view>
+    <view class="todo" bindtap="goPending">
+      <view class="todo-badge">{{pendingCount}}</view>
+      <view class="grow">
+        <view class="bold">{{isAdmin ? '条工位申请待审批' : '条我的申请在处理中'}}</view>
+        <view class="small text-weak mt-16">点击立即处理 ›</view>
+      </view>
+    </view>
+  </view>
+  </view>
+
+  <!-- 快捷入口 + 公告：电脑版左右并排 -->
+  <view class="card-grid">
+  <view class="card">
+    <view class="card-title">快捷功能</view>
+    <view class="quick">
+      <view class="quick-item" bindtap="goSeat">
+        <view class="qi-icon blue">位</view>
+        <text>工位地图</text>
+      </view>
+      <view class="quick-item" wx:if="{{!isAdmin}}" bindtap="goScan">
+        <view class="qi-icon green">申</view>
+        <text>扫码申请</text>
+      </view>
+      <view class="quick-item" wx:if="{{!isAdmin}}" bindtap="goRecords">
+        <view class="qi-icon orange">记</view>
+        <text>申请记录</text>
+      </view>
+      <view class="quick-item" wx:if="{{!isAdmin}}" bindtap="goMine">
+        <view class="qi-icon purple">我</view>
+        <text>个人中心</text>
+      </view>
+      <view class="quick-item" wx:if="{{isAdmin}}" bindtap="goApproval">
+        <view class="qi-icon green">审</view>
+        <text>申请审批</text>
+      </view>
+      <view class="quick-item" wx:if="{{isAdmin}}" bindtap="goRegister">
+        <view class="qi-icon orange">登</view>
+        <text>登记管理</text>
+      </view>
+      <view class="quick-item" wx:if="{{isAdmin}}" bindtap="goAdmin">
+        <view class="qi-icon purple">台</view>
+        <text>登记后台</text>
+      </view>
+      <view class="quick-item" wx:if="{{isAdmin}}" bindtap="goStudents">
+        <view class="qi-icon blue">生</view>
+        <text>学生信息</text>
+      </view>
+      <view class="quick-item" wx:if="{{isAdmin}}" bindtap="goOffices">
+        <view class="qi-icon green">室</view>
+        <text>办公室配置</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 公告 -->
+  <view class="card">
+    <view class="card-title">通知公告</view>
+    <view
+      class="notice"
+      wx:for="{{notices}}"
+      wx:key="id"
+      data-index="{{index}}"
+      bindtap="showNotice"
+    >
+      <view class="notice-dot"></view>
+      <view class="grow">
+        <view class="notice-title">{{item.title}}</view>
+        <view class="small text-weak mt-16">{{item.publisher}} · {{item.time}}</view>
+      </view>
+      <text class="tag {{item.type === '重要' ? 'danger' : (item.type === '提醒' ? 'warning' : 'primary')}}">{{item.type}}</text>
+    </view>
+  </view>
+  </view>
+</view>
+</pc-shell>

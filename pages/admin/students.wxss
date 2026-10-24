@@ -1,0 +1,167 @@
+.form-item {
+  margin-bottom: 16rpx;
+}
+
+.form-row {
+  display: flex;
+}
+
+.form-row .form-item.grow {
+  flex: 1;
+  margin-right: 12rpx;
+}
+
+.form-row .form-item.grow:last-child {
+  margin-right: 0;
+}
+
+.label {
+  display: block;
+  font-size: 24rpx;
+  color: var(--text-sub);
+  margin-bottom: 8rpx;
+}
+
+.input {
+  height: 76rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  background: #f2f4f8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.search-input {
+  height: 76rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  background: #f2f4f8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.textarea {
+  width: 100%;
+  height: 200rpx;
+  padding: 20rpx;
+  margin-top: 16rpx;
+  box-sizing: border-box;
+  background: #f2f4f8;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+}
+
+.ops {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.op {
+  padding: 10rpx 22rpx;
+  margin: 0 12rpx 12rpx 0;
+  border-radius: 10rpx;
+  background: #f2f4f8;
+  color: var(--text-sub);
+  font-size: 24rpx;
+}
+
+.op.primary {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.op.danger {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.preview {
+  margin-top: 16rpx;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  background: #f2f4f8;
+}
+
+.list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.check {
+  width: 56rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #f2f4f8;
+  color: transparent;
+  font-size: 26rpx;
+}
+
+.check.on {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-mini {
+  padding: 10rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.stu {
+  display: flex;
+  align-items: flex-start;
+  padding: 20rpx 0;
+  border-top: 2rpx solid var(--line);
+}
+
+.stu .check {
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.ops-col {
+  flex-shrink: 0;
+  margin-left: 12rpx;
+}
+
+.kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10rpx 0;
+  font-size: 26rpx;
+}
+
+.preview-row {
+  padding: 16rpx 0;
+  border-top: 2rpx solid var(--line);
+}
+
+.text-danger {
+  color: var(--danger);
+}
+
+/* 电脑端：表格行内紧凑排版 */
+.page.pc .check {
+  width: 48rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  margin-right: 12rpx;
+}
+
+.page.pc .table-row .ops {
+  margin: 0;
+}
+
+.page.pc .table-row .op {
+  margin-bottom: 0;
+}
+
+.page.pc .stu {
+  align-items: center;
+}

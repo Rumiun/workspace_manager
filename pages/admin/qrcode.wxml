@@ -1,0 +1,132 @@
+<pc-shell nav="qrcode" title="二维码标签">
+<view class="page {{isWide ? 'pc' : ''}}">
+  <view class="pc-hint" wx:if="{{isPC}}">电脑端视图：可在电脑上调整样式并导出图片，也可复制清单用外部工具批量生成。</view>
+  <!-- 范围 -->
+  <view class="card">
+    <view class="card-title">
+      导出范围
+      <text class="more">共 {{total}} 个工位</text>
+    </view>
+    <view class="chips">
+      <view
+        class="chip {{scope === item.key ? 'on' : ''}}"
+        wx:for="{{scopes}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="pickScope"
+      >{{item.name}}</view>
+    </view>
+  </view>
+
+  <!-- 样式 -->
+  <view class="card">
+    <view class="card-title">二维码样式</view>
+
+    <view class="field-label">配色主题</view>
+    <view class="chips">
+      <view
+        class="chip {{style.theme === item.key ? 'on' : ''}}"
+        wx:for="{{themes}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="pickTheme"
+      >
+        <view class="swatch" style="background: {{item.fg}}; border-color: {{item.cellBg}}"></view>
+        {{item.name}}
+      </view>
+    </view>
+
+    <view class="field-label mt-24">码点形状</view>
+    <view class="chips">
+      <view
+        class="chip {{style.shape === item.key ? 'on' : ''}}"
+        wx:for="{{shapes}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="pickShape"
+      >{{item.name}}</view>
+    </view>
+
+    <view class="field-label mt-24">纠错等级</view>
+    <view class="chips">
+      <view class="chip {{style.ecl === item ? 'on' : ''}}" wx:for="{{ecls}}" wx:key="*this" data-key="{{item}}" bindtap="pickEcl">{{item}}</view>
+    </view>
+
+    <view class="field-label mt-24">每行个数</view>
+    <view class="chips">
+      <view class="chip {{style.cols === item ? 'on' : ''}}" wx:for="{{colOptions}}" wx:key="*this" data-key="{{item}}" bindtap="pickCols">{{item}} 个</view>
+    </view>
+
+    <view class="field-label mt-24">显示项</view>
+    <view class="chips">
+      <view class="chip {{style.showCode ? 'on' : ''}}" data-key="showCode" bindtap="toggle">工位编号</view>
+      <view class="chip {{style.showZone ? 'on' : ''}}" data-key="showZone" bindtap="toggle">楼栋名称</view>
+      <view class="chip {{style.badge ? 'on' : ''}}" data-key="badge" bindtap="toggle">中心徽标</view>
+      <view class="chip {{style.numbered ? 'on' : ''}}" data-key="numbered" bindtap="toggle">序号圆点</view>
+    </view>
+
+    <view class="field-label mt-24">卡片文字</view>
+    <input
+      class="txt-input"
+      value="{{style.headerText}}"
+      data-field="headerText"
+      maxlength="20"
+      placeholder="顶部标题，如 研究生工位管理系统"
+      bindinput="onText"
+      bindblur="applyStyle"
+      bindconfirm="applyStyle"
+    />
+    <input
+      class="txt-input"
+      wx:for="{{style.tips}}"
+      wx:key="index"
+      value="{{item}}"
+      data-field="tips"
+      data-index="{{index}}"
+      maxlength="24"
+      placeholder="第 {{index + 1}} 条提示"
+      bindinput="onText"
+      bindblur="applyStyle"
+      bindconfirm="applyStyle"
+    />
+    <input
+      class="txt-input"
+      value="{{style.footerText}}"
+      data-field="footerText"
+      maxlength="24"
+      placeholder="底部文案，如 研究生院 · 工位管理"
+      bindinput="onText"
+      bindblur="applyStyle"
+      bindconfirm="applyStyle"
+    />
+    <view class="small text-weak mt-16">文字留空即隐藏该区域；标题与底部以主题色条呈现，样式参照工位标签实物。</view>
+    <view class="btn block plain mt-16" bindtap="resetStyle">恢复默认样式</view>
+  </view>
+
+  <!-- 预览 -->
+  <view class="card">
+    <view class="card-title">
+      拼版预览
+      <text class="more">第 {{pageIndex + 1}} / {{pageCount}} 页</text>
+    </view>
+    <scroll-view class="canvas-box" scroll-x style="background: {{style.pageBg}}; height: {{canvasH}}px;">
+      <canvas canvas-id="qrCanvas" style="width: {{canvasW}}px; height: {{canvasH}}px;"></canvas>
+    </scroll-view>
+    <view class="small text-weak mt-16">预览可左右滑动；导出图片按 3 倍分辨率生成，便于打印</view>
+    <view class="pager">
+      <view class="btn plain grow" bindtap="prevPage">上一页</view>
+      <view class="btn plain grow" bindtap="nextPage">下一页</view>
+    </view>
+    <view class="small text-weak mt-16">二维码内容：QR_BASE/s/{二维码编号}（永久绑定，改工位编号不变）</view>
+  </view>
+
+  <!-- 导出 -->
+  <view class="card">
+    <view class="card-title">导出</view>
+    <view class="btn block" bindtap="exportAll">一键导出全部（{{pageCount}} 张）</view>
+    <view class="btn block ghost mt-16" bindtap="exportCurrent">导出当前页</view>
+    <view class="btn block plain mt-16" bindtap="copyList">复制二维码内容清单</view>
+    <view class="small text-weak mt-16">导出的图片保存在系统相册，可直接打印后裁剪粘贴到工位</view>
+  </view>
+</view>
+</pc-shell>

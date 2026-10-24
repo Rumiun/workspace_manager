@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "登记管理",
+  "usingComponents": {
+    "pc-shell": "/components/pc-shell/index"
+  }
+}

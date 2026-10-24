@@ -1,0 +1,50 @@
+<pc-shell nav="approval" title="申请审批">
+<view class="page {{isWide ? 'pc' : ''}}">
+  <view class="pc-hint" wx:if="{{isPC}}">电脑端视图：申请卡片按两列铺开，可一键通过全部待审批。</view>
+  <view class="tabs">
+    <view class="tab {{tab === 'pending' ? 'active' : ''}}" data-tab="pending" bindtap="switchTab">
+      待审批 {{pendingCount}}
+    </view>
+    <view class="tab {{tab === 'done' ? 'active' : ''}}" data-tab="done" bindtap="switchTab">
+      已处理 {{doneCount}}
+    </view>
+  </view>
+
+  <view class="batch" wx:if="{{tab === 'pending' && pendingCount > 0}}">
+    <text class="small text-weak">共 {{pendingCount}} 条待审批</text>
+    <view class="btn-mini" bindtap="approveAll">一键通过</view>
+  </view>
+
+  <view class="list-2col">
+  <view class="card" wx:for="{{apps}}" wx:key="id">
+    <view class="row">
+      <view>
+        <view class="bold">{{item.studentName}} <text class="small text-weak">{{item.studentId}}</text></view>
+        <view class="small text-weak mt-16">提交于 {{item.applyTime}}</view>
+      </view>
+      <text class="tag {{item.tagClass}}">{{item.statusText}}</text>
+    </view>
+
+    <view class="divider"></view>
+
+    <view class="kv">
+      <text class="text-sub">申请工位</text>
+      <text class="text-primary bold">{{item.seatCode}} · {{item.zone}} 区</text>
+    </view>
+    <view class="kv">
+      <text class="text-sub">使用期限</text>
+      <text>{{item.startDate}} 至 {{item.endDate}}</text>
+    </view>
+    <view class="reason">申请理由：{{item.reason}}</view>
+    <view class="comment" wx:if="{{item.comment}}">审批意见：{{item.comment}}</view>
+
+    <view class="btns" wx:if="{{item.status === 'pending'}}">
+      <view class="btn ghost grow" data-id="{{item.id}}" bindtap="reject">驳回</view>
+      <view class="btn grow" data-id="{{item.id}}" bindtap="approve">同意分配</view>
+    </view>
+  </view>
+  </view>
+
+  <view class="empty" wx:if="{{!apps.length}}">暂无{{tab === 'pending' ? '待审批' : '已处理'}}申请</view>
+</view>
+</pc-shell>

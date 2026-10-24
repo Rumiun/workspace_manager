@@ -1,0 +1,172 @@
+<pc-shell nav="students" title="学生管理">
+<view class="page {{isWide ? 'pc' : ''}}">
+  <view class="pc-hint" wx:if="{{isPC}}">电脑端视图：可直接上传本机 Excel 文件，示例表格与导出名单可另存到本机磁盘。</view>
+
+  <view class="cols">
+    <!-- Excel 上传导入 -->
+    <view class="card">
+      <view class="card-title">
+        Excel 批量导入
+        <text class="more" bindtap="downloadSample">下载示例表格 ›</text>
+      </view>
+      <view class="small text-weak">
+        支持 .xlsx 与 CSV（UTF-8）文件，首行为表头时按列名匹配（学号 / 姓名 / 学院 / 年级 / 导师 / 手机 / 邮箱），学号已存在则更新。
+      </view>
+      <view class="ops mt-16">
+        <view class="op primary" bindtap="chooseFile">上传 Excel 文件</view>
+        <view class="op" bindtap="downloadSample">下载示例</view>
+        <view class="op" bindtap="exportFile">导出名单到设备</view>
+        <view class="op" bindtap="copyStudents">复制名单</view>
+      </view>
+
+      <view class="divider"></view>
+
+      <!-- 无文件时：粘贴导入备用 -->
+      <block wx:if="{{!preview}}">
+        <view class="small text-weak">无法上传文件时，可在 Excel 中全选复制后粘贴到下方：</view>
+        <textarea class="textarea" placeholder="粘贴从 Excel 复制的表格内容" value="{{pasteText}}" bindinput="onPasteText" />
+        <view class="ops mt-16">
+          <view class="op primary" bindtap="parsePaste">解析粘贴内容</view>
+          <view class="op" bindtap="clearPaste">清空</view>
+        </view>
+      </block>
+
+      <!-- 解析预览 -->
+      <block wx:else>
+        <view class="row">
+          <text class="bold">{{fileName || '表格数据'}}</text>
+          <text class="small text-weak">共 {{preview.total}} 行</text>
+        </view>
+        <view class="kv">
+          <text class="text-sub">有效记录</text>
+          <text>{{preview.valid}} 条（新增 {{preview.added}} · 更新 {{preview.updated}}）</text>
+        </view>
+        <view class="kv" wx:if="{{preview.invalid > 0}}">
+          <text class="text-sub">无效行</text>
+          <text class="text-danger">{{preview.invalid}} 行（缺少学号或姓名，将跳过）</text>
+        </view>
+
+        <!-- 电脑端表格预览 -->
+        <block wx:if="{{isWide}}">
+          <view class="table-head mt-16">
+            <text>学号</text><text>姓名</text><text>学院</text><text>年级</text><text>导师</text><text>手机</text>
+          </view>
+          <view class="table-row" wx:for="{{preview.rows}}" wx:key="id">
+            <text>{{item.id}}</text><text>{{item.name}}</text><text>{{item.college || '—'}}</text>
+            <text>{{item.grade || '—'}}</text><text>{{item.tutor || '—'}}</text><text>{{item.phone || '—'}}</text>
+          </view>
+          <view class="small text-weak mt-16" wx:if="{{preview.valid > 8}}">仅预览前 8 条，共 {{preview.valid}} 条</view>
+        </block>
+
+        <!-- 移动端卡片预览 -->
+        <block wx:else>
+          <view class="preview-row" wx:for="{{preview.rows}}" wx:key="id">
+            <view class="bold">{{item.name}} <text class="small text-weak">{{item.id}}</text></view>
+            <view class="small text-weak mt-16">{{item.college || '—'}} · {{item.grade || '—'}}</view>
+            <view class="small text-weak mt-16" wx:if="{{item.tutor}}">导师 {{item.tutor}} · {{item.phone || '—'}}</view>
+          </view>
+          <view class="small text-weak mt-16" wx:if="{{preview.valid > 8}}">仅预览前 8 条，共 {{preview.valid}} 条</view>
+        </block>
+
+        <view class="btn block mt-24" bindtap="confirmImport">确认导入（{{preview.valid}} 条）</view>
+        <view class="btn block plain mt-16" bindtap="clearImport">取消</view>
+      </block>
+    </view>
+
+    <!-- 新增 / 编辑 -->
+    <view class="card">
+      <view class="card-title">{{editingId ? '编辑学生信息' : '添加学生'}}</view>
+      <view class="form-row">
+        <view class="form-item grow">
+          <text class="label">学号</text>
+          <input class="input" placeholder="学号（登录账号）" value="{{form.id}}" data-field="id" bindinput="onFormInput" disabled="{{!!editingId}}" />
+        </view>
+        <view class="form-item grow">
+          <text class="label">姓名</text>
+          <input class="input" placeholder="姓名" value="{{form.name}}" data-field="name" bindinput="onFormInput" />
+        </view>
+      </view>
+      <view class="form-item">
+        <text class="label">学院</text>
+        <input class="input" placeholder="如：计算机科学与技术学院" value="{{form.college}}" data-field="college" bindinput="onFormInput" />
+      </view>
+      <view class="form-item">
+        <text class="label">年级</text>
+        <input class="input" placeholder="如：2023 级硕士研究生" value="{{form.grade}}" data-field="grade" bindinput="onFormInput" />
+      </view>
+      <view class="form-item">
+        <text class="label">导师</text>
+        <input class="input" placeholder="如：李国栋 教授" value="{{form.tutor}}" data-field="tutor" bindinput="onFormInput" />
+      </view>
+      <view class="form-row">
+        <view class="form-item grow">
+          <text class="label">手机</text>
+          <input class="input" placeholder="手机号" value="{{form.phone}}" data-field="phone" bindinput="onFormInput" />
+        </view>
+        <view class="form-item grow">
+          <text class="label">邮箱</text>
+          <input class="input" placeholder="邮箱" value="{{form.email}}" data-field="email" bindinput="onFormInput" />
+        </view>
+      </view>
+      <view class="form-item">
+        <text class="label">登录密码</text>
+        <input class="input" placeholder="留空则默认/保持原密码 123456" value="{{form.password}}" data-field="password" bindinput="onFormInput" />
+      </view>
+      <view class="btn block mt-16" bindtap="submitForm">{{editingId ? '保存修改' : '添加学生'}}</view>
+      <view class="btn block plain mt-16" wx:if="{{editingId}}" bindtap="cancelEdit">取消编辑</view>
+    </view>
+  </view>
+
+  <!-- 学生名单 -->
+  <view class="card">
+    <view class="card-title">
+      学生名单
+      <text class="more">已选 {{checkedCount}} 人</text>
+    </view>
+    <input class="search-input" placeholder="搜索学号 / 姓名 / 导师" value="{{keyword}}" bindinput="onSearch" />
+
+    <view class="list-head mt-16">
+      <view class="check" bindtap="toggleAll">全选</view>
+      <view class="btn-mini danger" bindtap="batchDelete">批量删除</view>
+    </view>
+
+    <view class="empty" wx:if="{{!students.length}}">暂无学生，可通过上方表单或 Excel 导入添加</view>
+
+    <!-- 电脑端表格 -->
+    <block wx:if="{{isWide}}">
+      <view class="table-head mt-16">
+        <text style="flex:0 0 60rpx"></text>
+        <text>学号</text><text>姓名</text><text>学院 / 年级</text><text>导师</text><text>手机</text><text style="flex:0 0 160rpx">操作</text>
+      </view>
+      <view class="table-row" wx:for="{{students}}" wx:key="id">
+        <view class="check {{item.checked ? 'on' : ''}}" data-index="{{index}}" bindtap="toggleCheck">✓</view>
+        <text>{{item.id}}</text>
+        <text>{{item.name}}</text>
+        <text>{{item.college}} · {{item.grade}}</text>
+        <text>{{item.tutor || '—'}}</text>
+        <text>{{item.phone || '—'}}</text>
+        <view class="ops" style="flex:0 0 160rpx">
+          <view class="op" data-index="{{index}}" bindtap="editStudent">编辑</view>
+          <view class="op danger" data-id="{{item.id}}" bindtap="deleteOne">删除</view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 移动端卡片 -->
+    <block wx:else>
+      <view class="stu" wx:for="{{students}}" wx:key="id">
+        <view class="check {{item.checked ? 'on' : ''}}" data-index="{{index}}" bindtap="toggleCheck">✓</view>
+        <view class="grow">
+          <view class="bold">{{item.name}} <text class="small text-weak">{{item.id}}</text></view>
+          <view class="small text-weak mt-16">{{item.college}} · {{item.grade}}</view>
+          <view class="small text-weak mt-16" wx:if="{{item.tutor}}">导师 {{item.tutor}} · {{item.phone || '—'}}</view>
+        </view>
+        <view class="ops-col">
+          <view class="op" data-index="{{index}}" bindtap="editStudent">编辑</view>
+          <view class="op danger" data-id="{{item.id}}" bindtap="deleteOne">删除</view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>
+</pc-shell>

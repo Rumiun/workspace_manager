@@ -1,0 +1,78 @@
+<block wx:if="{{wide}}">
+  <view class="pc-desk">
+    <view class="pc-frame" style="{{frameStyle}}">
+      <!-- 左侧导航 / 品牌 -->
+      <view class="pc-side {{compact ? 'compact' : ''}}" style="{{sideStyle}}" wx:if="{{chrome}}">
+        <view class="pc-brand">
+          <view class="pc-logo">工</view>
+          <block wx:if="{{!compact}}">
+            <view class="pc-brand-name">工位管理平台</view>
+            <view class="pc-brand-sub">{{modeLabel}}</view>
+          </block>
+        </view>
+        <scroll-view class="pc-menu" scroll-y>
+          <view class="pc-group" wx:for="{{groups}}" wx:key="name">
+            <view class="pc-group-title" wx:if="{{!compact}}">{{item.name}}</view>
+            <view
+              class="pc-nav {{activeKey === it.key ? 'on' : ''}}"
+              wx:for="{{item.items}}"
+              wx:for-item="it"
+              wx:key="key"
+              data-url="{{it.url}}"
+              data-type="{{it.type}}"
+              bindtap="goNav"
+            >
+              <view class="pc-nav-ic">{{it.icon}}</view>
+              <view class="pc-nav-tx" wx:if="{{!compact}}">{{it.text}}</view>
+            </view>
+          </view>
+        </scroll-view>
+        <!-- 侧栏底部：登记状态与本学期使用期限 -->
+        <view class="pc-side-stat" wx:if="{{!compact}}">
+          <view class="pc-side-kv"><text>登记状态</text><text class="{{registerOpen ? 'ok' : 'no'}}">{{registerText}}</text></view>
+          <view class="pc-side-kv"><text>使用期限</text><text>{{termText}}</text></view>
+        </view>
+        <view class="pc-side-foot" wx:if="{{!compact}}">{{userName}} · {{roleText}}</view>
+      </view>
+
+      <!-- 主区 -->
+      <view class="pc-main" style="{{chrome ? mainStyle : ''}}">
+        <view class="pc-top {{tiny ? 'tiny' : ''}}" style="{{chrome ? 'height:' + topH + 'px' : ''}}" wx:if="{{chrome}}">
+          <view class="pc-top-left">
+            <view class="pc-title">{{title}}</view>
+            <view class="pc-crumb" wx:if="{{!tiny}}">{{deviceLabel}} · {{modeLabel}}{{forcedText}}</view>
+          </view>
+          <view class="pc-top-right">
+            <view class="pc-chip {{registerOpen ? 'on' : 'off'}}" wx:if="{{!tiny}}">{{registerOpen ? '登记开放中' : '登记已关闭'}}</view>
+            <view class="pc-user">{{userName}}<text class="pc-role" wx:if="{{!tiny}}">{{roleText}}</text></view>
+            <view class="pc-date" wx:if="{{!tiny}}">{{today}}</view>
+            <view class="pc-refresh" catchtap="refreshPage">刷新</view>
+            <view class="pc-switch" catchtap="useMobile">手机版</view>
+            <view class="pc-quit" bindtap="quit">退出</view>
+          </view>
+        </view>
+
+        <view class="pc-hintbar" wx:if="{{chrome && hint}}">{{hint}}</view>
+        <view class="pc-body {{tiny ? 'tiny' : ''}}" style="{{chrome ? 'padding:' + gap + 'px' : 'padding:0'}}">
+          <!-- 内容列：移动端子页面按 16:9 画布宽度整体缩放 -->
+          <scroll-view class="pc-stage" scroll-y enhanced show-scrollbar="{{false}}" style="{{stageStyle}}">
+            <!-- scaler 用测量后的视觉高度撑开，避免 transform 缩放后滚动区域远大于实际内容 -->
+            <view class="pc-scaler {{scalerFlowing ? 'flowing' : ''}}" style="{{scalerStyle}}">
+              <view class="pc-layer {{compact ? 'compact' : ''}}" style="{{layerStyle}}">
+                <slot />
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
+  </view>
+</block>
+
+<!-- 手机模式：原样渲染 + 页面内底部导航（电脑版分支不会渲染它，因此底部没有任何导航与留白） -->
+<block wx:else>
+  <view class="pc-passthrough">
+    <slot />
+    <tab-nav />
+  </view>
+</block>

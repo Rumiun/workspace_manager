@@ -1,0 +1,344 @@
+/* 电脑版外壳：自适应比例画布（宽高比跟随窗口，最宽 16:9、最高 1:2）+ 左侧导航 + 顶栏 + 内容列
+   （无底部导航栏、无右侧信息栏）；外壳本身用 px 排版（不随窗口缩放），页面内容沿用 rpx 并按画布宽度整体缩放 */
+
+.pc-passthrough {
+  display: block;
+}
+
+.pc-desk {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  /* 高于自定义 tabBar（z-index: 999），确保电脑版画布盖住任何残留的底部导航层 */
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #f4f6fa;
+}
+
+/* 画布铺满整个窗口（= 全屏），不再有圆角与投影 */
+.pc-frame {
+  display: flex;
+  background: #f4f6fa;
+  overflow: hidden;
+}
+
+/* ---------- 侧栏 ---------- */
+.pc-side {
+  background: linear-gradient(180deg, #24406f 0%, #1d3159 100%);
+  color: #d7e2f5;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+  box-sizing: border-box;
+  flex: none;
+}
+
+.pc-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px 18px;
+}
+
+/* 极窄画布（手机上选电脑版）侧栏再收一档，避免图标条被内边距挤爆 */
+.pc-side.compact {
+  padding: 12px 8px;
+}
+
+.pc-side.compact .pc-brand {
+  padding: 4px 0 14px;
+  justify-content: center;
+}
+
+.pc-side.compact .pc-nav {
+  padding: 9px 0;
+  justify-content: center;
+}
+
+/* 极窄画布：顶栏压缩，只留标题 + 版本号 + 退出 */
+.pc-top.tiny {
+  padding: 0 10px;
+}
+
+.pc-top.tiny .pc-title {
+  font-size: 14px;
+}
+
+.pc-top.tiny .pc-top-right {
+  gap: 8px;
+}
+
+.pc-top.tiny .pc-refresh,
+.pc-top.tiny .pc-switch,
+.pc-top.tiny .pc-quit {
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+.pc-body.tiny {
+  gap: 8px;
+}
+
+.pc-logo {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 9px;
+  background: #2f6bff;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pc-brand-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.pc-brand-sub {
+  font-size: 11px;
+  color: #8fa6cf;
+  margin-top: 2px;
+}
+
+.pc-menu {
+  flex: 1;
+  overflow: hidden;
+}
+
+.pc-group {
+  margin-bottom: 14px;
+}
+
+.pc-group-title {
+  font-size: 11px;
+  color: #7f95c2;
+  padding: 0 8px 6px;
+  letter-spacing: 1px;
+}
+
+.pc-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.pc-nav:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pc-nav.on {
+  background: #2f6bff;
+  color: #fff;
+}
+
+.pc-nav-ic {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pc-nav.on .pc-nav-ic {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.pc-nav-tx {
+  font-size: 13px;
+  color: #e7eefb;
+}
+
+.pc-nav.on .pc-nav-tx {
+  color: #fff;
+  font-weight: 500;
+}
+
+.pc-side-stat {
+  padding: 10px 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pc-side-kv {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: #8fa6cf;
+  line-height: 1.6;
+}
+
+.pc-side-kv .ok { color: #4ade80; }
+.pc-side-kv .no { color: #f97066; }
+
+.pc-side-foot {
+  font-size: 11px;
+  color: #7f95c2;
+  padding: 10px 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- 主区 ---------- */
+.pc-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  background: #fff;
+  border-bottom: 1px solid #e8ecf3;
+  box-sizing: border-box;
+  flex: none;
+}
+
+.pc-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a2233;
+}
+
+.pc-crumb {
+  font-size: 11px;
+  color: #9aa4b5;
+  margin-top: 2px;
+}
+
+.pc-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pc-chip {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.pc-chip.on {
+  background: #e6f7ee;
+  color: #17b26a;
+}
+
+.pc-chip.off {
+  background: #fdeceb;
+  color: #f04438;
+}
+
+.pc-user {
+  font-size: 13px;
+  color: #1a2233;
+}
+
+.pc-role {
+  margin-left: 6px;
+  font-size: 11px;
+  color: #6b7688;
+}
+
+.pc-date {
+  font-size: 12px;
+  color: #9aa4b5;
+}
+
+.pc-refresh {
+  font-size: 12px;
+  color: #2f6bff;
+  padding: 5px 12px;
+  border: 1px solid #cddcff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pc-quit {
+  font-size: 12px;
+  color: #f04438;
+  padding: 5px 12px;
+  border: 1px solid #fbd5d2;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* 全屏 / 退出全屏（仅微信电脑端可用） */
+/* 窄窗口：侧栏换成顶部横向图标条，内容占满整宽（不再左右分栏挤压） */
+.pc-hintbar {
+  padding: 10px 18px;
+  background: #eaf0ff;
+  color: #2f6bff;
+  font-size: 12px;
+}
+
+.pc-body {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 内容列：外层滚动容器，内层为按 windowWidth 排布后缩放的页面内容 */
+.pc-stage {
+  flex: none;
+  background: transparent;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* 缩放容器：高度 = 内容缩放后的视觉高度（由 syncScalerHeight 测量写入），
+   因此滚动区域与实际内容一致；测量失败时退回 flowing（内容按原始高度参与布局） */
+.pc-scaler {
+  position: relative;
+  width: 100%;
+}
+
+.pc-scaler.flowing {
+  height: auto;
+}
+
+.pc-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-height: 100%;
+  transform-origin: 0 0;
+}
+
+.pc-scaler.flowing .pc-layer {
+  position: static;
+}
+
+/* ---------- 顶栏视图切换 ---------- */
+.pc-switch {
+  font-size: 12px;
+  color: #6b7688;
+  padding: 5px 12px;
+  border: 1px solid #e3e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+}

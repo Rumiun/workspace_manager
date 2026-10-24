@@ -1,0 +1,96 @@
+<pc-shell nav="adminRegister" title="登记管理">
+<view class="page admin {{isWide ? 'pc' : ''}}">
+  <view class="pc-hint" wx:if="{{isPC}}">电脑端视图：可在电脑上维护登记开放时间、批次与使用期限。</view>
+  <view class="cols">
+  <!-- 当前状态 -->
+  <view class="card">
+    <view class="card-title">登记状态</view>
+    <view class="kv">
+      <text class="text-sub">当前</text>
+      <text class="{{register.open ? 'text-success' : 'text-danger'}}">{{register.text}}</text>
+    </view>
+    <view class="kv">
+      <text class="text-sub">今日</text>
+      <text>{{register.today}}</text>
+    </view>
+    <view class="kv">
+      <text class="text-sub">开放时间</text>
+      <text>{{settings.registerStart || '不限'}} 至 {{settings.registerEnd || '不限'}}</text>
+    </view>
+    <view class="kv">
+      <text class="text-sub">当前使用期限</text>
+      <text>{{termText}}</text>
+    </view>
+    <view class="btn block {{settings.registerOpen ? 'plain' : ''}} mt-24" bindtap="toggleOpen">
+      {{settings.registerOpen ? '关闭登记' : '开放登记'}}
+    </view>
+    <view class="small text-weak mt-16">关闭后立即停止新的申请与登记；到达开放时间会自动开启，超过结束时间会自动关闭。</view>
+  </view>
+
+  <!-- 开放时间 -->
+  <view class="card">
+    <view class="card-title">登记开放时间</view>
+    <view class="field-label">开始日期（留空表示不限）</view>
+    <picker mode="date" value="{{settings.registerStart}}" data-field="registerStart" bindchange="onDate">
+      <view class="picker-line">{{settings.registerStart || '不限（立即开放）'}}</view>
+    </picker>
+    <view class="field-label mt-16">结束日期（留空表示不限）</view>
+    <picker mode="date" value="{{settings.registerEnd}}" data-field="registerEnd" bindchange="onDate">
+      <view class="picker-line">{{settings.registerEnd || '不限（长期开放）'}}</view>
+    </picker>
+    <view class="btn block plain mt-16" bindtap="clearRange">清除时间限制</view>
+
+    <view class="field-label mt-24">工位使用期限（默认）</view>
+    <picker mode="date" value="{{settings.termStart}}" data-field="termStart" bindchange="onDate">
+      <view class="picker-line">{{settings.termStart}}</view>
+    </picker>
+    <view class="field-label mt-16">使用期限截止</view>
+    <picker mode="date" value="{{settings.termEnd}}" data-field="termEnd" bindchange="onDate">
+      <view class="picker-line">{{settings.termEnd}}</view>
+    </picker>
+    <view class="small text-weak mt-16">未命中任何批次时使用此期限；命中批次时按批次期限。</view>
+  </view>
+  </view>
+
+  <!-- 批次 -->
+  <view class="card">
+    <view class="card-title">
+      登记批次
+      <text class="more">共 {{batches.length}} 个</text>
+    </view>
+    <view class="small text-weak">同一批登记的同学可使用不同的使用期限；今日落在批次登记窗口内时，该批次自动开放。</view>
+
+    <view class="batch" wx:for="{{batches}}" wx:key="id">
+      <input
+        class="txt-input"
+        value="{{item.name}}"
+        data-index="{{index}}"
+        maxlength="20"
+        placeholder="批次名称，如 2026 春季批次"
+        bindinput="onBatchName"
+      />
+      <view class="field-label">登记时间</view>
+      <picker mode="date" value="{{item.registerStart}}" data-index="{{index}}" data-key="registerStart" bindchange="onBatchDate">
+        <view class="picker-line">{{item.registerStart || '不限'}}</view>
+      </picker>
+      <picker mode="date" value="{{item.registerEnd}}" data-index="{{index}}" data-key="registerEnd" bindchange="onBatchDate">
+        <view class="picker-line">{{item.registerEnd || '不限'}}</view>
+      </picker>
+      <view class="field-label mt-16">该批次使用期限</view>
+      <picker mode="date" value="{{item.termStart}}" data-index="{{index}}" data-key="termStart" bindchange="onBatchDate">
+        <view class="picker-line">{{item.termStart || '同默认'}}</view>
+      </picker>
+      <picker mode="date" value="{{item.termEnd}}" data-index="{{index}}" data-key="termEnd" bindchange="onBatchDate">
+        <view class="picker-line">{{item.termEnd || '同默认'}}</view>
+      </picker>
+      <view class="btn block plain mt-16" data-index="{{index}}" bindtap="removeBatch">删除该批次</view>
+    </view>
+
+    <view class="btn block ghost mt-24" bindtap="addBatch">新增批次</view>
+    <view class="empty" wx:if="{{!batches.length}}">暂无批次，未设置时按上面的开放时间与默认期限执行</view>
+  </view>
+
+  <view class="btn block mt-24" bindtap="onSave">保存登记设置</view>
+  <view class="btn block plain mt-16" bindtap="resetData">重置演示数据</view>
+</view>
+</pc-shell>

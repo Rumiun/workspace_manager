@@ -1,0 +1,13 @@
+<view class="tabnav-wrap" wx:if="{{visible}}">
+  <view
+    wx:for="{{list}}"
+    wx:key="pagePath"
+    class="tabnav-item {{index === selected ? 'active' : ''}}"
+    data-path="{{item.pagePath}}"
+    data-index="{{index}}"
+    bindtap="onTap"
+  >
+    <view class="tabnav-dot"></view>
+    <text class="tabnav-text">{{item.text}}</text>
+  </view>
+</view>

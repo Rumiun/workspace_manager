@@ -1,0 +1,91 @@
+.login {
+  min-height: 100vh;
+  background: #f2f4f8;
+}
+.lg-head {
+  padding: 80rpx 48rpx 100rpx;
+  background: linear-gradient(160deg, #2f6bff 0%, #5b8cff 100%);
+  color: #fff;
+  border-bottom-left-radius: 48rpx;
+  border-bottom-right-radius: 48rpx;
+}
+.lg-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+.lg-sub {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+.lg-body {
+  margin: -60rpx 32rpx 40rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 10rpx 40rpx rgba(24, 39, 75, 0.08);
+}
+.role-switch {
+  display: flex;
+  background: #f2f4f8;
+  border-radius: 16rpx;
+  padding: 6rpx;
+  margin-bottom: 32rpx;
+}
+.role-item {
+  flex: 1;
+  text-align: center;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 28rpx;
+  color: #6b7688;
+  border-radius: 12rpx;
+}
+.role-item.active {
+  background: #fff;
+  color: #2f6bff;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(47, 107, 255, 0.15);
+}
+.field {
+  margin-bottom: 24rpx;
+}
+.label {
+  display: block;
+  font-size: 26rpx;
+  color: #6b7688;
+  margin-bottom: 12rpx;
+}
+.input {
+  height: 88rpx;
+  background: #f7f9fc;
+  border: 2rpx solid #edf0f5;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+}
+.demo {
+  margin-top: 40rpx;
+  border-top: 2rpx dashed #edf0f5;
+  padding-top: 24rpx;
+}
+.demo-title {
+  font-size: 24rpx;
+  color: #9aa4b5;
+  margin-bottom: 12rpx;
+}
+.demo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18rpx 20rpx;
+  background: #f7f9fc;
+  border-radius: 14rpx;
+  margin-bottom: 12rpx;
+  font-size: 26rpx;
+}
+.demo-item .demo-id {
+  color: #2f6bff;
+  font-weight: 600;
+}

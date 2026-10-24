@@ -1,0 +1,99 @@
+<pc-shell nav="seat" title="工位地图">
+<view class="page seat-page {{isWide ? 'pc' : ''}}">
+  <!-- 搜索 -->
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索工位编号 / 数字编号，如 A-0102 或 0102" value="{{keyword}}" bindinput="onSearch" />
+    <view class="search-clear" wx:if="{{keyword}}" bindtap="clearSearch">清空</view>
+  </view>
+
+  <!-- 区域切换 -->
+  <view class="zone-tabs">
+    <view class="zone-tab {{currentZone === item.key ? 'active' : ''}}" wx:for="{{zoneTabs}}" wx:key="key" data-zone="{{item.key}}" bindtap="switchZone">
+      {{item.label}}
+    </view>
+  </view>
+
+  <!-- 图例 -->
+  <view class="legend">
+    <view class="lg-item"><view class="lg-box free"></view>空闲</view>
+    <view class="lg-item"><view class="lg-box used"></view>已占用</view>
+    <view class="lg-item"><view class="lg-box mine"></view>我的工位</view>
+    <view class="lg-item"><view class="lg-box repair"></view>维修中</view>
+  </view>
+
+  <!-- 工位图 -->
+  <view class="card" wx:if="{{zones.length}}">
+    <view class="zone-block" wx:for="{{zones}}" wx:key="key">
+      <view class="zone-title">
+        <text class="bold">{{item.name}}</text>
+        <text class="small text-weak">空闲 {{item.freeCount}} / {{item.total}}</text>
+      </view>
+      <!-- 自定义布局：办公室照片 + 点击座位 -->
+      <view class="map-wrap" wx:if="{{item.map}}">
+        <image class="map-img" src="{{item.map.image}}" mode="widthFix" />
+        <view
+          class="map-seat {{s.type}}"
+          wx:for="{{item.map.points}}"
+          wx:for-item="s"
+          wx:key="code"
+          style="left:{{s.x}}%;top:{{s.y}}%"
+          data-code="{{s.code}}"
+          bindtap="onSeatTap"
+        >{{s.label}}</view>
+      </view>
+
+      <block wx:else>
+        <!-- 标准网格布局：wx:else 不能与 wx:for 同节点，因此用 block 包一层 -->
+        <view class="seat-row" wx:for="{{item.rows}}" wx:for-item="row" wx:key="key">
+          <view
+            class="seat {{s.type}}"
+            wx:for="{{row.list}}"
+            wx:for-item="s"
+            wx:key="code"
+            data-code="{{s.code}}"
+            bindtap="onSeatTap"
+          >{{s.label}}</view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>未找到匹配的工位</view>
+
+  <view class="tip">提示：点击工位可查看详情{{isAdmin ? '，管理员可直接修改编号、调整状态与释放归属' : '，登记工位请扫描工位上的二维码'}}</view>
+
+  <!-- 工位详情弹层 -->
+  <view class="mask" wx:if="{{detail}}" bindtap="closeDetail">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-head">
+        <view class="sheet-code {{detail.codeLong ? 'long' : ''}}">{{detail.no || detail.code}}</view>
+        <text class="tag {{detail.tagClass}}">{{detail.statusText}}</text>
+      </view>
+      <view class="kv">
+        <text class="text-sub">所属区域</text>
+        <text>{{detail.zoneName}}</text>
+      </view>
+      <view class="kv">
+        <text class="text-sub">工位编号</text>
+        <text>{{detail.code}}</text>
+      </view>
+      <view class="kv">
+        <text class="text-sub">使用人</text>
+        <text>{{detail.ownerName || '—'}}</text>
+      </view>
+      <view class="kv">
+        <text class="text-sub">位置</text>
+        <text>{{detail.posText}}</text>
+      </view>
+
+      <block wx:if="{{isAdmin}}">
+        <view class="btn block mt-24" bindtap="adminRename">修改工位编号</view>
+        <view class="btn block mt-24" wx:if="{{detail.status === 'repair'}}" bindtap="adminRepair">恢复为可用</view>
+        <view class="btn block mt-24" wx:if="{{detail.status !== 'repair'}}" bindtap="adminRepair">标记为维修中</view>
+        <view class="btn block plain mt-24" wx:if="{{detail.status === 'used'}}" bindtap="adminRelease">释放该工位</view>
+      </block>
+      <view class="btn block plain mt-24" bindtap="closeDetail">关闭</view>
+    </view>
+  </view>
+</view>
+</pc-shell>

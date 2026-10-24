@@ -1,0 +1,37 @@
+<pc-shell nav="settings" title="系统设置">
+<view class="page {{isWide ? 'pc' : ''}}">
+  <view class="pc-hint" wx:if="{{isPC}}">电脑端视图：登记模式为全局配置，保存后立即生效；开放时间与使用期限请在「登记管理」中设置。</view>
+  <view class="cols">
+  <view class="card">
+    <view class="card-title">登记模式</view>
+    <view class="mode {{mode === item.key ? 'on' : ''}}" wx:for="{{modes}}" wx:key="key" data-key="{{item.key}}" bindtap="pickMode">
+      <view class="bold">{{item.name}}</view>
+      <view class="small text-weak mt-16">{{item.desc}}</view>
+    </view>
+    <view class="btn block mt-24" bindtap="save">保存设置</view>
+    <view class="btn block ghost mt-16" bindtap="goRegister">登记管理（开放时间 / 使用期限 / 批次）</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">二维码规则</view>
+    <view class="kv">
+      <text class="text-sub">二维码域名</text>
+      <text>{{qrBase}}</text>
+    </view>
+    <view class="kv">
+      <text class="text-sub">二维码内容</text>
+      <text class="text-primary">{{qrBase}}/s/{工位编号}</text>
+    </view>
+    <view class="small text-weak mt-16">
+      工位编号在工位创建时生成且不可变更（如 S0001），与办公室名称、工位展示编号（如 A-0102）解耦，因此调整办公室或编号不会导致二维码变化，一个工位始终只对应一个二维码。
+    </view>
+    <view class="ops mt-16">
+      <view class="op primary" bindtap="goQr">批量导出二维码</view>
+      <view class="op" bindtap="goSeats">工位归属后台</view>
+      <view class="op" bindtap="goOffices">办公室配置</view>
+      <view class="op" bindtap="goStudents">学生信息</view>
+    </view>
+  </view>
+  </view>
+</view>
+</pc-shell>

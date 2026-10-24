@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "tab-nav": "/components/tab-nav/index"
+  }
+}

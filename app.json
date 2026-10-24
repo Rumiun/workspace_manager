@@ -1,0 +1,33 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/home/home",
+    "pages/seat/seat",
+    "pages/register/register",
+    "pages/records/records",
+    "pages/approval/approval",
+    "pages/admin/register",
+    "pages/mine/mine",
+    "pages/admin/seats",
+    "pages/admin/offices",
+    "pages/admin/map",
+    "pages/admin/students",
+    "pages/admin/settings",
+    "pages/admin/qrcode"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#2f6bff",
+    "navigationBarTitleText": "研究生工位管理系统",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f2f4f8"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "resizable": true,
+  "usingComponents": {
+    "pc-shell": "/components/pc-shell/index"
+  }
+}

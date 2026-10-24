@@ -1,0 +1,42 @@
+<pc-shell title="登录" chrome="{{false}}">
+<view class="login">
+  <view class="lg-head">
+    <view class="lg-title">研究生工位管理系统</view>
+    <view class="lg-sub">Graduate Workstation Management System</view>
+  </view>
+
+  <view class="lg-body">
+    <view class="role-switch">
+      <view class="role-item {{role === 'student' ? 'active' : ''}}" bindtap="switchRole" data-role="student">研究生</view>
+      <view class="role-item {{role === 'admin' ? 'active' : ''}}" bindtap="switchRole" data-role="admin">管理员</view>
+    </view>
+
+    <view class="field">
+      <text class="label">{{role === 'student' ? '学号' : '管理员工号'}}</text>
+      <input class="input" placeholder="请输入账号" value="{{account}}" bindinput="onAccount" />
+    </view>
+    <view class="field">
+      <text class="label">密码</text>
+      <input class="input" password placeholder="请输入密码" value="{{password}}" bindinput="onPassword" />
+    </view>
+
+    <view class="btn block mt-24" bindtap="doLogin">登 录</view>
+
+    <view class="demo">
+      <view class="demo-title">演示账号（密码统一 123456）</view>
+      <view class="demo-item" bindtap="fillDemo" data-account="2023001" data-role="student">
+        <text class="demo-name">张明 · 硕士研究生</text>
+        <text class="demo-id">2023001</text>
+      </view>
+      <view class="demo-item" bindtap="fillDemo" data-account="2023002" data-role="student">
+        <text class="demo-name">刘思佳 · 博士研究生</text>
+        <text class="demo-id">2023002</text>
+      </view>
+      <view class="demo-item" bindtap="fillDemo" data-account="admin" data-role="admin">
+        <text class="demo-name">王雅琴 · 工位管理员</text>
+        <text class="demo-id">admin</text>
+      </view>
+    </view>
+  </view>
+</view>
+</pc-shell>

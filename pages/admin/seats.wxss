@@ -1,0 +1,83 @@
+.stat-grid {
+  display: flex;
+}
+
+.stat-cell {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 44rpx;
+  font-weight: 700;
+}
+
+.stat-label {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--text-weak);
+}
+
+.rate-bar {
+  height: 12rpx;
+  margin-top: 24rpx;
+  border-radius: 999rpx;
+  background: #eef1f6;
+  overflow: hidden;
+}
+
+.rate-inner {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999rpx;
+}
+
+.search-input {
+  height: 80rpx;
+  padding: 0 20rpx;
+  background: #f2f4f8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.filters {
+  display: flex;
+}
+
+.filter {
+  padding: 10rpx 24rpx;
+  margin-right: 12rpx;
+  border-radius: 999rpx;
+  background: #f2f4f8;
+  color: var(--text-sub);
+  font-size: 24rpx;
+}
+
+.filter.on {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.seat-row {
+  padding: 20rpx 0;
+  border-top: 2rpx solid var(--line);
+}
+
+.seat-row:first-child {
+  border-top: none;
+}
+
+.ops {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 16rpx;
+}
+
+.op {
+  padding: 8rpx 20rpx;
+  margin: 0 12rpx 12rpx 0;
+  border-radius: 8rpx;
+  background: #f2f4f8;
+  color: var(--text-sub);
+  font-size: 24rpx;
+}

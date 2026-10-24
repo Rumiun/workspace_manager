@@ -1,0 +1,102 @@
+<pc-shell nav="offices" title="工位地图">
+<view class="page {{isWide ? 'pc' : ''}}">
+  <view class="pc-hint" wx:if="{{isPC}}">电脑端视图：点击画布空白处添加工位，拖动工位按钮即可调整位置，右侧可上传照片与批量添加。</view>
+
+  <view class="card">
+    <view class="card-title">
+      {{officeName || '工位地图'}}
+      <text class="more">共 {{points.length}} 个工位</text>
+    </view>
+    <view class="small text-weak">点击画布空白处添加座位 · 拖动座位按钮调整位置 · 保存后自动生成工位编号与二维码</view>
+    <view class="map-src">
+      <text class="tag {{source === 'server' ? 'success' : ''}}">{{source === 'server' ? '已连接服务端' : '本机缓存'}}</text>
+      <text class="small text-weak">{{source === 'server' ? '地图照片与点位均从服务端下载 / 保存到服务端' : '服务端不可用，正在使用本机缓存；启动 server 后点右侧刷新'}}</text>
+      <view class="op plain" bindtap="reloadFromServer">{{loading ? '加载中…' : '重新拉取'}}</view>
+    </view>
+  </view>
+
+  <view class="cols">
+    <!-- 画布 -->
+    <view class="card map-card">
+      <view class="map-canvas" id="mapCanvas" bindtap="onCanvasTap">
+        <image wx:if="{{image}}" class="map-img" src="{{image}}" mode="widthFix" bindload="onImgLoad" />
+        <view wx:else class="map-empty">
+          <view class="map-empty-title">还没有背景图</view>
+          <view class="map-empty-desc">先在右侧「背景图」上传办公室照片或平面图，再点击画布放置工位</view>
+        </view>
+        <view
+          class="map-point {{selected === index ? 'on' : ''}}"
+          wx:for="{{points}}"
+          wx:key="k"
+          style="left:{{item.x}}%;top:{{item.y}}%"
+          data-index="{{index}}"
+          catchtap="onPointTap"
+          catchtouchmove="onPointMove"
+        >{{item.no || index + 1}}</view>
+      </view>
+    </view>
+
+    <!-- 右侧设置 -->
+    <view class="map-side">
+      <view class="card">
+        <view class="card-title">背景图</view>
+        <view class="bg-row">
+          <view class="bg-thumb" wx:if="{{image}}">
+            <image src="{{image}}" mode="aspectFill" />
+          </view>
+          <view class="bg-info">
+            <view class="bg-name">{{image ? imageName : '未上传照片'}}</view>
+            <view class="small text-weak">照片保存在本机，建议上传办公室平面图或正对拍摄的全景图</view>
+          </view>
+        </view>
+        <view class="ops mt-16">
+          <view class="op primary" bindtap="takePhoto">{{uploading ? '上传中…' : '拍照上传'}}</view>
+          <view class="op primary" bindtap="chooseFromAlbum">从相册选择</view>
+          <view class="op danger" wx:if="{{image}}" bindtap="removeImage">移除照片</view>
+        </view>
+        <view class="small text-weak mt-16" wx:if="{{uploading}}">正在上传到服务端，请稍候…</view>
+        <view class="small text-weak mt-16" wx:elif="{{image}}">{{cloud ? '照片已保存到服务端，任何设备打开都能看到' : '照片只保存在本机（服务端不可用时的兜底，保存时会尝试补传）'}}</view>
+        <view class="small text-weak mt-16" wx:else>选择「拍照上传」现场拍摄，或「从相册选择」已有平面图</view>
+      </view>
+
+      <view class="card">
+        <view class="card-title">选中座位</view>
+        <block wx:if="{{selected >= 0 && points.length}}">
+          <view class="kv">
+            <text class="text-sub">工位序号</text>
+            <text>{{selected + 1}} 号</text>
+          </view>
+          <view class="kv">
+            <text class="text-sub">位置</text>
+            <text>左 {{points[selected].x}}% · 上 {{points[selected].y}}%</text>
+          </view>
+          <view class="btn block plain mt-16" bindtap="removeSelected">删除该工位</view>
+        </block>
+        <view class="small text-weak" wx:else>点击画布上的工位即可选中</view>
+      </view>
+
+      <view class="card">
+        <view class="card-title">批量操作</view>
+        <view class="form-item">
+          <text class="label">批量添加数量</text>
+          <input class="input" type="number" value="{{batchCount}}" bindinput="onBatchInput" />
+        </view>
+        <view class="ops mt-16">
+          <view class="op primary" bindtap="batchAdd">按网格添加</view>
+          <view class="op danger" bindtap="clearAll">清空所有座位</view>
+        </view>
+        <view class="small text-weak mt-16">批量添加会按 5 列自动铺开，随后可逐个拖动到实际位置。</view>
+      </view>
+
+      <view class="card">
+        <view class="btn block {{saving ? 'disabled' : ''}}" bindtap="save">{{saving ? '保存中…' : '保存布局'}}</view>
+        <view class="btn block plain mt-16" bindtap="goBack">返回办公室配置</view>
+        <view class="small text-weak mt-16">
+          保存后按点位顺序生成编号（{{officePrefix || '前缀'}}-01、{{officePrefix || '前缀'}}-02…）；已登记工位按顺序保留，二维码不变。
+        </view>
+        <view class="small text-weak mt-16">保存会把「地图照片 + 点位」一并提交到服务端，其它设备打开地图时自动从服务端下载。</view>
+      </view>
+    </view>
+  </view>
+</view>
+</pc-shell>

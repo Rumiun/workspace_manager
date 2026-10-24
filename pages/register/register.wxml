@@ -1,0 +1,135 @@
+<pc-shell nav="register" title="扫码登记">
+<view class="page register {{isWide ? 'pc' : ''}}">
+  <!-- 扫码 / 手输工位号 -->
+  <view class="card">
+    <view class="card-title">
+      工位申请与登记
+      <text class="more" bindtap="onScan">重新扫码 ›</text>
+    </view>
+    <view class="search">
+      <input
+        class="search-input"
+        placeholder="扫码或输入工位编号 / 数字编号，如 A-0102"
+        value="{{inputCode}}"
+        bindinput="onInput"
+        bindconfirm="onQuery"
+      />
+      <view class="search-btn" bindtap="onQuery">查询</view>
+    </view>
+    <view class="small text-weak mt-16">申请工位需扫描工位上的固定二维码，使用期限由管理员统一设置</view>
+  </view>
+
+  <!-- 加载 / 错误 -->
+  <view class="card" wx:if="{{loading}}">
+    <view class="empty">正在查询工位状态…</view>
+  </view>
+  <view class="card" wx:elif="{{errorMsg}}">
+    <view class="empty">{{errorMsg}}</view>
+  </view>
+
+  <!-- 工位信息 -->
+  <block wx:elif="{{seat}}">
+    <view class="card seat-card">
+      <view class="seat-head">
+        <view class="seat-code">{{seat.code}}</view>
+        <text class="tag {{statusClass}}">{{statusText}}</text>
+      </view>
+      <view class="seat-zone">{{seat.officeName}} · 第 {{seat.row}} 排 第 {{seat.col}} 座 · {{seat.facility}}</view>
+
+      <view class="divider"></view>
+
+      <view class="kv">
+        <text class="text-sub">数字编号（地图显示）</text>
+        <text>{{seat.no || '—'}}</text>
+      </view>
+      <view class="kv">
+        <text class="text-sub">二维码编号（永久不变）</text>
+        <text class="text-primary">{{seat.id}}</text>
+      </view>
+      <view class="kv">
+        <text class="text-sub">使用期限</text>
+        <text>{{termText}}</text>
+      </view>
+      <view class="kv">
+        <text class="text-sub">归属状态</text>
+        <text wx:if="{{isMine}}">{{seat.ownerName}}（本人）· {{seat.owner}}</text>
+        <text wx:elif="{{taken}}">{{seat.ownerName}} 使用中 · {{seat.ownerIdMasked}}</text>
+        <text wx:else>暂无归属</text>
+      </view>
+      <view class="kv" wx:if="{{seat.claimedAt}}">
+        <text class="text-sub">登记时间</text>
+        <text>{{seat.claimedAt}}</text>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{isAdmin}}">
+      <view class="card-title">管理员操作</view>
+      <view class="small text-weak">二维码内容：{{qrContent}}</view>
+      <view class="ops mt-16">
+        <view class="op" bindtap="copyQr">复制二维码内容</view>
+        <view class="op" wx:if="{{seat.owner}}" bindtap="onAdminRelease">释放归属</view>
+        <view class="op" bindtap="onAdminToggle">{{seat.status === 'repair' ? '恢复空闲' : '停用维修'}}</view>
+      </view>
+    </view>
+
+    <!-- 提示 -->
+    <view class="card">
+      <view class="tip {{disabled ? 'danger' : (taken || hasSeat ? 'warning' : (isMine ? 'primary' : (registerOpen ? 'success' : 'danger')))}}">
+        <block wx:if="{{disabled}}">该工位已停用（维修中），暂不可申请</block>
+        <block wx:elif="{{taken}}">该工位已被其他同学登记，一工位一归属，不可重复申请</block>
+        <block wx:elif="{{isMine}}">该工位已登记在你的名下，退订后其他同学方可申请</block>
+        <block wx:elif="{{hasSeat}}">你已登记工位 {{mySeatCode}}，一工位一归属，请先退订后再申请其他工位</block>
+        <block wx:elif="{{!registerOpen}}">当前不在登记开放时间内：{{registerText}}</block>
+        <block wx:else>该工位当前空闲，使用期限由管理员设置：{{termText}}</block>
+      </view>
+      <view class="small text-weak mt-16" wx:if="{{pendingTip}}">{{pendingTip}}</view>
+    </view>
+
+    <!-- 申请理由 -->
+    <view class="card" wx:if="{{canApply}}">
+      <view class="card-title">申请理由</view>
+      <textarea
+        class="textarea"
+        placeholder="请说明申请该工位的原因，如课题组搬迁、设备需求等"
+        value="{{reason}}"
+        bindinput="onReason"
+        maxlength="200"
+      />
+      <view class="counter">{{reason.length}}/200</view>
+    </view>
+
+    <!-- 登记流水 -->
+    <view class="card" wx:if="{{logs.length}}">
+      <view class="card-title">登记记录</view>
+      <view class="log" wx:for="{{logs}}" wx:key="id">
+        <view class="log-dot"></view>
+        <view class="grow">
+          <view class="bold small">{{item.action === 'claim' ? '登记' : (item.action === 'release' || item.action === 'admin_release' ? '退订' : '状态变更')}} · {{item.studentName || '系统'}}</view>
+          <view class="small text-weak mt-16">{{item.time}} · {{item.operator || '系统'}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部操作 -->
+    <view class="footer">
+      <view wx:if="{{isMine}}" class="btn block danger" bindtap="onRelease">退订该工位</view>
+      <view wx:elif="{{canApply}}" class="btn block" bindtap="onApply">提交工位申请</view>
+      <view wx:elif="{{canClaim}}" class="btn block" bindtap="onClaim">登记为该工位使用人</view>
+      <view wx:elif="{{hasSeat}}" class="btn block disabled">你已有工位，不可再登记</view>
+      <view wx:elif="{{!registerOpen}}" class="btn block disabled">登记未开放</view>
+      <view wx:else class="btn block disabled">当前不可申请</view>
+      <view class="btn block plain mt-16" bindtap="goHome">返回首页</view>
+    </view>
+  </block>
+
+  <!-- 未扫码 -->
+  <view class="card" wx:else>
+    <view class="scan-guide" bindtap="onScan">
+      <view class="scan-icon">扫</view>
+      <view class="bold">扫描工位二维码</view>
+      <view class="small text-weak mt-16">申请或登记工位请先扫描工位上的固定二维码</view>
+    </view>
+    <view class="btn block plain mt-24" bindtap="goHome">返回首页</view>
+  </view>
+</view>
+</pc-shell>

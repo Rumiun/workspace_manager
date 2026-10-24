@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "办公室与工位配置",
+  "usingComponents": {
+    "pc-shell": "/components/pc-shell/index"
+  }
+}

@@ -1,0 +1,107 @@
+<pc-shell nav="seats" title="工位归属">
+<view class="page admin {{isWide ? 'pc' : ''}}">
+  <view class="pc-hint" wx:if="{{isPC}}">电脑端视图：列表按两列铺开，可在此调整办公室、学生信息与系统设置。</view>
+  <view class="cols">
+  <!-- 概览 -->
+  <view class="card">
+    <view class="card-title">工位归属概览</view>
+    <view class="stat-grid">
+      <view class="stat-cell">
+        <view class="stat-num">{{stats.total}}</view>
+        <view class="stat-label">工位总数</view>
+      </view>
+      <view class="stat-cell">
+        <view class="stat-num text-primary">{{stats.used}}</view>
+        <view class="stat-label">已登记</view>
+      </view>
+      <view class="stat-cell">
+        <view class="stat-num text-success">{{stats.free}}</view>
+        <view class="stat-label">空闲</view>
+      </view>
+      <view class="stat-cell">
+        <view class="stat-num text-danger">{{stats.repair}}</view>
+        <view class="stat-label">停用</view>
+      </view>
+    </view>
+    <view class="rate-bar">
+      <view class="rate-inner" style="width: {{stats.rate}}%"></view>
+    </view>
+    <view class="small text-weak mt-16">登记率 {{stats.rate}}%</view>
+    <view class="btn block ghost mt-24" bindtap="goQrExport">批量导出工位二维码</view>
+    <view class="ops mt-16">
+      <view class="op" bindtap="goOffices">办公室配置</view>
+      <view class="op" bindtap="goStudents">学生信息</view>
+      <view class="op" bindtap="goSettings">系统设置</view>
+    </view>
+  </view>
+
+  <!-- 检索 -->
+  <view class="card">
+    <input
+      class="search-input"
+      placeholder="搜索工位编号 / 二维码编号 / 学号 / 姓名"
+      value="{{keyword}}"
+      bindinput="onSearch"
+      bindconfirm="onSearch"
+    />
+    <view class="filters mt-16">
+      <view class="filter {{officeId === '' ? 'on' : ''}}" data-id="" data-name="全部办公室" bindtap="pickOffice">全部办公室</view>
+      <view
+        class="filter {{officeId === item.id ? 'on' : ''}}"
+        wx:for="{{offices}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        data-name="{{item.name}}"
+        bindtap="pickOffice"
+      >{{item.name}}</view>
+    </view>
+    <view class="filters mt-16">
+      <view
+        class="filter {{status === item.key ? 'on' : ''}}"
+        wx:for="{{tabs}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="switchFilter"
+      >{{item.text}}</view>
+    </view>
+    <view class="small text-weak mt-16">当前范围：{{officeName}}</view>
+  </view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="card">
+    <view class="card-title">
+      工位列表
+      <text class="more">共 {{list.length}} 个</text>
+    </view>
+    <view class="empty" wx:if="{{!list.length}}">暂无符合条件的工位</view>
+    <view class="list-2col">
+    <view class="seat-row" wx:for="{{list}}" wx:key="id">
+      <view class="row">
+        <view class="bold">{{item.code}}</view>
+        <text class="tag {{item.status === 'used' ? 'primary' : (item.status === 'repair' ? 'danger' : 'success')}}">
+          {{item.status === 'used' ? '已登记' : (item.status === 'repair' ? '停用' : '空闲')}}
+        </text>
+      </view>
+      <view class="small text-weak mt-16">{{item.officeName}} · {{item.posText}} · {{item.facility}}</view>
+      <view class="small text-weak mt-16">数字编号 {{item.no || '—'}} · 二维码编号 {{item.id}}（永久不变）</view>
+      <view class="small text-weak mt-16">期限 {{item.termStart}} 至 {{item.termEnd}}</view>
+      <view class="small mt-16" wx:if="{{item.ownerName}}">
+        归属：{{item.ownerName}}（{{item.owner}}）· {{item.claimedAt || '—'}}
+      </view>
+      <view class="small text-weak mt-16" wx:else>暂无归属</view>
+
+      <view class="ops">
+        <view class="op" data-qr="{{item.qrContent}}" bindtap="onQr">二维码</view>
+        <view class="op" data-id="{{item.id}}" data-code="{{item.code}}" bindtap="onRename">改编号</view>
+        <view class="op" wx:if="{{item.ownerName}}" data-id="{{item.id}}" data-code="{{item.code}}" bindtap="onRelease">释放归属</view>
+        <view class="op" wx:if="{{item.status !== 'repair'}}" data-id="{{item.id}}" data-status="repair" bindtap="onToggleStatus">停用</view>
+        <view class="op" wx:else data-id="{{item.id}}" data-status="free" bindtap="onToggleStatus">恢复空闲</view>
+      </view>
+    </view>
+    </view>
+  </view>
+
+  <view class="btn block danger" bindtap="logout">退出登录</view>
+</view>
+</pc-shell>

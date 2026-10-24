@@ -1,0 +1,5 @@
+<view class="splash">
+  <view class="logo">工位</view>
+  <view class="splash-title">研究生工位管理系统</view>
+  <view class="splash-sub">Graduate Workstation Management</view>
+</view>

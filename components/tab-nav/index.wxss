@@ -1,0 +1,47 @@
+/* 底部导航栏（页面内组件）：仅由 pc-shell 的手机版分支渲染 */
+.tabnav-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  background: #fff;
+  border-top: 2rpx solid #edf0f5;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4rpx 20rpx rgba(24, 39, 75, 0.05);
+  z-index: 999;
+}
+
+.tabnav-item {
+  flex: 1;
+  height: 110rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.tabnav-dot {
+  width: 0;
+  height: 6rpx;
+  border-radius: 6rpx;
+  background: #2f6bff;
+  margin-bottom: 10rpx;
+  transition: all 0.2s;
+}
+
+.tabnav-text {
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+.tabnav-item.active .tabnav-text {
+  color: #2f6bff;
+  font-weight: 600;
+  font-size: 26rpx;
+}
+
+.tabnav-item.active .tabnav-dot {
+  width: 44rpx;
+}

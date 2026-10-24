@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "申请审批",
+  "usingComponents": {
+    "pc-shell": "/components/pc-shell/index"
+  }
+}

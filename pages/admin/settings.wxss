@@ -1,0 +1,62 @@
+.form-item {
+  margin-bottom: 16rpx;
+}
+
+.label {
+  display: block;
+  font-size: 24rpx;
+  color: var(--text-sub);
+  margin-bottom: 8rpx;
+}
+
+.picker {
+  height: 76rpx;
+  line-height: 76rpx;
+  padding: 0 20rpx;
+  background: #f2f4f8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.arrow {
+  float: right;
+  color: var(--text-weak);
+}
+
+.mode {
+  padding: 20rpx;
+  border-radius: 12rpx;
+  background: #f2f4f8;
+  margin-bottom: 16rpx;
+}
+
+.mode.on {
+  background: var(--primary-light);
+}
+
+.kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0;
+  font-size: 28rpx;
+}
+
+.ops {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.op {
+  padding: 10rpx 22rpx;
+  margin: 0 12rpx 12rpx 0;
+  border-radius: 10rpx;
+  background: #f2f4f8;
+  color: var(--text-sub);
+  font-size: 24rpx;
+}
+
+.op.primary {
+  background: var(--primary-light);
+  color: var(--primary);
+}

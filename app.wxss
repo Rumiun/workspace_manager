@@ -1,0 +1,285 @@
+page {
+  --primary: #2f6bff;
+  --primary-light: #eaf0ff;
+  --success: #17b26a;
+  --success-light: #e6f7ee;
+  --warning: #f79009;
+  --warning-light: #fff5e6;
+  --danger: #f04438;
+  --danger-light: #fdeceb;
+  --text: #1a2233;
+  --text-sub: #6b7688;
+  --text-weak: #9aa4b5;
+  --line: #edf0f5;
+  --card: #ffffff;
+  background: #f2f4f8;
+  color: #1a2233;
+  font-size: 28rpx;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 24rpx 24rpx calc(160rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 6rpx 24rpx rgba(24, 39, 75, 0.05);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.card-title .more {
+  font-size: 24rpx;
+  font-weight: 400;
+  color: #9aa4b5;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mt-16 { margin-top: 16rpx; }
+.mt-24 { margin-top: 24rpx; }
+.grow { flex: 1; }
+
+.text-sub { color: #6b7688; }
+.text-weak { color: #9aa4b5; }
+.text-primary { color: #2f6bff; }
+.text-danger { color: #f04438; }
+.text-success { color: #17b26a; }
+.small { font-size: 24rpx; }
+.bold { font-weight: 600; }
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: 16rpx;
+  background: #2f6bff;
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+.btn.ghost {
+  background: #eaf0ff;
+  color: #2f6bff;
+}
+.btn.plain {
+  background: #fff;
+  color: #6b7688;
+  border: 2rpx solid #e3e8f0;
+}
+.btn.danger {
+  background: #fdeceb;
+  color: #f04438;
+}
+.btn.block { width: 100%; }
+.btn.disabled {
+  background: #dfe4ec;
+  color: #fff;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+  background: #f2f4f8;
+  color: #6b7688;
+}
+.tag.primary { background: #eaf0ff; color: #2f6bff; }
+.tag.success { background: #e6f7ee; color: #17b26a; }
+.tag.warning { background: #fff5e6; color: #f79009; }
+.tag.danger { background: #fdeceb; color: #f04438; }
+
+.divider {
+  height: 2rpx;
+  background: #edf0f5;
+  margin: 20rpx 0;
+}
+
+.empty {
+  padding: 80rpx 0;
+  text-align: center;
+  color: #9aa4b5;
+  font-size: 26rpx;
+}
+
+.grid-2 {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -10rpx;
+}
+.grid-2 > view {
+  width: calc(50% - 20rpx);
+  margin: 10rpx;
+  box-sizing: border-box;
+}
+
+/* ============ 宽屏（Windows / Mac 微信、横屏平板）适配 ============ */
+/* 判定见 utils/layout.js：wide 模式下页面内容会被包进 pc-shell 的 16:9 画布并按比例缩放，
+   因此这里只需处理画布内的站内留白与分栏，不再限制最大宽度 */
+.page.pc {
+  max-width: none;
+  margin: 0;
+  padding: 0 0 40rpx;
+}
+
+.page.pc .card {
+  padding: 32rpx 36rpx;
+  border-radius: 16rpx;
+}
+
+/* 两栏容器：移动端纵向堆叠，电脑端左右并排 */
+.cols {
+  display: block;
+}
+
+.page.pc .cols {
+  display: flex;
+  align-items: flex-start;
+  gap: 24rpx;
+}
+
+.page.pc .cols > .card {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 列表在电脑端按三列铺开（窄画布退回两列） */
+.page.pc .list-2col {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.page.pc .list-2col > view {
+  width: calc(33.333% - 14rpx);
+  box-sizing: border-box;
+}
+
+.pc-layer.compact .page.pc .list-2col > view {
+  width: calc(50% - 10rpx);
+}
+
+/* 快捷入口：电脑端按网格铺开，避免几个图标被拉得很散 */
+.page.pc .quick {
+  flex-wrap: wrap;
+  gap: 24rpx 0;
+}
+
+.page.pc .quick-item {
+  flex: 0 0 calc(100% / 6);
+}
+
+.page.pc .qi-icon {
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  font-size: 28rpx;
+  border-radius: 16rpx;
+}
+
+/* 筛选标签在电脑端自动换行，不再被挤成一列 */
+.page.pc .filters {
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.page.pc .filter {
+  margin-right: 0;
+}
+
+/* 通用两栏容器：把两张卡片并排放（用于首页快捷功能 + 通知公告等） */
+.card-grid {
+  display: block;
+}
+
+.page.pc .card-grid {
+  display: flex;
+  align-items: flex-start;
+  gap: 24rpx;
+}
+
+.page.pc .card-grid > .card {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 表格视图：表头 + 行 */
+.table-head,
+.table-row {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 0;
+  border-top: 2rpx solid var(--line);
+  font-size: 26rpx;
+}
+
+.table-head {
+  font-weight: 600;
+  color: var(--text-sub);
+  border-top: none;
+}
+
+.table-head > text,
+.table-row > text {
+  flex: 1;
+  min-width: 0;
+  padding-right: 12rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-head > text:last-child,
+.table-row > text:last-child {
+  text-align: right;
+  padding-right: 0;
+}
+
+.page.pc .input,
+.page.pc .search-input,
+.page.pc .textarea {
+  font-size: 28rpx;
+}
+
+.page.pc .btn {
+  max-width: 420rpx;
+}
+
+.page.pc .btn.block {
+  max-width: none;
+}
+
+.pc-hint {
+  display: none;
+}
+
+.page.pc .pc-hint {
+  display: block;
+  margin: 0 0 20rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 12rpx;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 24rpx;
+}

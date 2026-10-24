@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "二维码导出",
+  "usingComponents": {
+    "pc-shell": "/components/pc-shell/index"
+  }
+}

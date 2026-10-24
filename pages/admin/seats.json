@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "工位管理后台",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "pc-shell": "/components/pc-shell/index"
+  }
+}

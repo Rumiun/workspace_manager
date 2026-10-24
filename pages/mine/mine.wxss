@@ -1,0 +1,12 @@
+.kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 0;
+  border-top: 2rpx solid var(--line);
+  font-size: 28rpx;
+}
+
+.kv:first-of-type {
+  border-top: none;
+}

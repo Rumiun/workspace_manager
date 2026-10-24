@@ -1,0 +1,33 @@
+.splash {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #2f6bff 0%, #5b8cff 60%, #8fb0ff 100%);
+  color: #fff;
+}
+.logo {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 40rpx;
+  background: rgba(255, 255, 255, 0.18);
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+  margin-bottom: 36rpx;
+}
+.splash-title {
+  font-size: 40rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+}
+.splash-sub {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  opacity: 0.75;
+}

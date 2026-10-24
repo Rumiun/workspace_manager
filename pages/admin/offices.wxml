@@ -1,0 +1,105 @@
+<pc-shell nav="offices" title="办公室配置">
+<view class="page {{isWide ? 'pc' : ''}}">
+  <view class="pc-hint" wx:if="{{isPC}}">电脑端视图：可快速配置各办公室的行列数（工位数）与编号前缀。</view>
+  <view class="cols">
+  <view class="card">
+    <view class="card-title">
+      办公室与工位配置
+      <text class="more">工位总数 {{totalSeats}}</text>
+    </view>
+    <view class="small text-weak">
+      办公室内工位数 = 行数 × 列数；保存后自动补建或删除末尾空闲工位。工位二维码按不可变编号生成，调整名称、前缀、编号均不会改变二维码。
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">新增办公室</view>
+    <view class="form-item">
+      <text class="label">办公室名称</text>
+      <input class="input" placeholder="如：D 区 · 科研主楼 5F" value="{{form.name}}" data-field="name" bindinput="onFormInput" />
+    </view>
+    <view class="form-item">
+      <text class="label">楼栋位置</text>
+      <input class="input" placeholder="如：科研主楼 5F" value="{{form.building}}" data-field="building" bindinput="onFormInput" />
+    </view>
+    <view class="form-item">
+      <text class="label">编号前缀</text>
+      <input class="input" placeholder="如：D" value="{{form.prefix}}" data-field="prefix" bindinput="onFormInput" />
+    </view>
+    <view class="form-item">
+      <text class="label">布局方式</text>
+      <view class="mode-chips">
+        <view class="mode-chip {{form.mapMode === 'grid' ? 'on' : ''}}" data-mode="grid" bindtap="onModePick">标准网格</view>
+        <view class="mode-chip {{form.mapMode === 'custom' ? 'on' : ''}}" data-mode="custom" bindtap="onModePick">自定义地图（上传照片）</view>
+      </view>
+    </view>
+    <block wx:if="{{form.mapMode === 'grid'}}">
+      <view class="form-row">
+        <view class="form-item grow">
+          <text class="label">行数</text>
+          <input class="input" type="number" value="{{form.rows}}" data-field="rows" bindinput="onFormInput" />
+        </view>
+        <view class="form-item grow">
+          <text class="label">列数</text>
+          <input class="input" type="number" value="{{form.cols}}" data-field="cols" bindinput="onFormInput" />
+        </view>
+      </view>
+      <view class="small text-weak mt-16">将生成 {{form.rows * form.cols}} 个工位（每个工位一枚独立二维码）</view>
+    </block>
+    <view class="small text-weak mt-16" wx:else>创建后进入「工位地图」上传办公室照片，点击画布放置每个工位，保存后自动生成工位编号与二维码。</view>
+    <view class="btn block mt-16" bindtap="addOffice">添加办公室</view>
+  </view>
+  </view>
+
+  <view class="list-2col">
+  <view class="card" wx:for="{{offices}}" wx:key="id">
+    <view class="card-title">
+      {{item.name}}
+      <text class="more">{{item.total}} 个工位 · 已登记 {{item.used}}</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">名称</text>
+      <input class="input" value="{{item.name}}" data-id="{{item.id}}" data-field="name" bindinput="onOfficeInput" />
+    </view>
+    <view class="form-item">
+      <text class="label">楼栋</text>
+      <input class="input" value="{{item.building}}" data-id="{{item.id}}" data-field="building" bindinput="onOfficeInput" />
+    </view>
+    <view class="form-row">
+      <view class="form-item grow">
+        <text class="label">编号前缀</text>
+        <input class="input" value="{{item.prefix}}" data-id="{{item.id}}" data-field="prefix" bindinput="onOfficeInput" />
+      </view>
+      <view class="form-item grow">
+        <text class="label">行数</text>
+        <input class="input" type="number" value="{{item.rows}}" data-id="{{item.id}}" data-field="rows" bindinput="onOfficeInput" />
+      </view>
+      <view class="form-item grow">
+        <text class="label">列数</text>
+        <input class="input" type="number" value="{{item.cols}}" data-id="{{item.id}}" data-field="cols" bindinput="onOfficeInput" />
+      </view>
+    </view>
+
+    <view class="mode-row">
+      <text class="small text-weak">布局方式</text>
+      <view class="mode-chips">
+        <view class="mode-chip {{item.mapMode === 'grid' ? 'on' : ''}}" data-id="{{item.id}}" data-mode="grid" bindtap="switchMapMode">标准网格</view>
+        <view class="mode-chip {{item.mapMode === 'custom' ? 'on' : ''}}" data-id="{{item.id}}" data-mode="custom" bindtap="switchMapMode">自定义地图</view>
+      </view>
+    </view>
+
+    <view class="ops mt-16">
+      <view class="op primary" data-id="{{item.id}}" bindtap="saveOffice">保存修改</view>
+      <view class="op" data-id="{{item.id}}" wx:if="{{item.mapMode === 'custom'}}" bindtap="editMap">工位地图</view>
+      <view class="op" data-id="{{item.id}}" bindtap="viewSeats">工位列表</view>
+      <view class="op danger" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="removeOffice">删除办公室</view>
+    </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="btn block ghost" bindtap="goQrExport">批量导出二维码</view>
+  </view>
+</view>
+</pc-shell>

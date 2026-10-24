@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "学生信息管理",
+  "usingComponents": {
+    "pc-shell": "/components/pc-shell/index"
+  }
+}
