@@ -27,6 +27,9 @@ function clampPct(v) {
 }
 
 Page(layout.wrap({
+  /* 地图编辑器自己管服务端拉取（照片 + 点位），关掉通用同步，
+     避免拉快照后触发 load() 把正在编辑的点位冲掉 */
+  noServerSync: true,
   data: {
     officeId: '',
     officeName: '',

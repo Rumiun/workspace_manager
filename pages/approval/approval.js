@@ -1,4 +1,6 @@
 var store = require('../../utils/store.js')
+var api = require('../../utils/api.js')
+var sync = require('../../utils/sync.js')
 var util = require('../../utils/util.js')
 var layout = require('../../utils/layout.js')
 
@@ -25,6 +27,7 @@ Page(layout.wrap({
       return wx.redirectTo({ url: '/pages/home/home' })
     }
     this.adminName = user.name
+    this.user = user
     this.render()
   },
 
@@ -71,34 +74,47 @@ Page(layout.wrap({
       confirmText: '全部通过',
       success: function (r) {
         if (!r.confirm) return
+        // 先按服务端已归属的工位排掉冲突项，剩下的串行提交
         var seats = store.getSeats()
         var ownerMap = {}
         seats.forEach(function (s) { if (s.owner) ownerMap[s.id] = s.owner })
-        var pass = 0
-        var skipped = []
+        var queue = []
         list.forEach(function (a) {
           var seatKey = a.seatId || a.seatCode
           var owner = ownerMap[seatKey]
           if (owner && owner !== a.studentId) {
-            skipped.push(a.seatCode)
             return
           }
-          var res = store.handleApp(a.id, true, self.adminName, '批量审批通过，工位已分配。')
-          if (res.ok) {
-            pass += 1
-            ownerMap[seatKey] = a.studentId
-          } else {
-            skipped.push(a.seatCode)
+          queue.push(a)
+          ownerMap[seatKey] = a.studentId
+        })
+        if (!queue.length) return util.toast('没有可审批的申请')
+
+        wx.showLoading({ title: '处理中…' })
+        var pass = 0
+        var skipped = []
+        // 串行提交：每条都等服务端返回，避免并发把同一个工位分配给两个人
+        var step = function (i) {
+          if (i >= queue.length) {
+            wx.hideLoading()
+            // 服务端为准：审批结果以服务端最新数据重渲染
+            sync.refresh().then(function () { self.render() })
+            if (!skipped.length) return util.toast('已通过 ' + pass + ' 条', 'success')
+            wx.showModal({
+              title: '批量审批完成',
+              content: '通过 ' + pass + ' 条，跳过 ' + skipped.length + ' 条（工位不可用）：' + skipped.join('、'),
+              showCancel: false,
+              confirmText: '知道了'
+            })
+            return
           }
-        })
-        self.render()
-        if (!skipped.length) return util.toast('已通过 ' + pass + ' 条', 'success')
-        wx.showModal({
-          title: '批量审批完成',
-          content: '通过 ' + pass + ' 条，跳过 ' + skipped.length + ' 条（工位不可用）：' + skipped.join('、'),
-          showCancel: false,
-          confirmText: '知道了'
-        })
+          api.handleApp(queue[i].id, true, self.user, '批量审批通过，工位已分配。').then(function (res) {
+            if (res && res.ok) pass += 1
+            else skipped.push(queue[i].seatCode)
+            step(i + 1)
+          })
+        }
+        step(0)
       }
     })
   },
@@ -112,10 +128,13 @@ Page(layout.wrap({
       confirmColor: '#2f6bff',
       success: function (res) {
         if (!res.confirm) return
-        var r = store.handleApp(id, true, self.adminName, '符合工位分配条件，予以通过。')
-        if (!r.ok) return util.toast(r.msg)
-        util.toast('已通过并分配工位', 'success')
-        self.render()
+        wx.showLoading({ title: '提交中…' })
+        api.handleApp(id, true, self.user, '符合工位分配条件，予以通过。').then(function (res) {
+          wx.hideLoading()
+          if (!res || !res.ok) return util.toast((res && res.msg) || '操作失败')
+          util.toast('已通过并分配工位', 'success')
+          sync.refresh().then(function () { self.render() })
+        })
       }
     })
   },
@@ -131,10 +150,13 @@ Page(layout.wrap({
       confirmColor: '#f04438',
       success: function (res) {
         if (!res.confirm) return
-        var r = store.handleApp(id, false, self.adminName, res.content || '不符合当前工位分配条件。')
-        if (!r.ok) return util.toast(r.msg)
-        util.toast('已驳回', 'success')
-        self.render()
+        wx.showLoading({ title: '提交中…' })
+        api.handleApp(id, false, self.user, res.content || '不符合当前工位分配条件。').then(function (r) {
+          wx.hideLoading()
+          if (!r || !r.ok) return util.toast((r && r.msg) || '操作失败')
+          util.toast('已驳回', 'success')
+          sync.refresh().then(function () { self.render() })
+        })
       }
     })
   }

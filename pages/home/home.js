@@ -66,6 +66,12 @@ Page(layout.wrap({
     this.switchUi('pc')
   },
 
+  /** 服务端快照到达后由 layout.wrap 自动调用：用服务端最新数据重渲染 */
+  onServerUpdate: function () {
+    var user = this.data.user && this.data.user.id ? this.data.user : app.getUser()
+    if (user) this.load(user)
+  },
+
   load: function (user) {
     var self = this
     var settings = store.getSettings()

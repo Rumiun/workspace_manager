@@ -45,6 +45,11 @@ Page(layout.wrap({
     })
   },
 
+  /** 服务端快照到达后由 layout.wrap 自动调用：按服务端最新数据重渲染列表 */
+  onServerUpdate: function () {
+    this.load()
+  },
+
   loadOffices: function () {
     var self = this
     api.getOffices().then(function (res) {

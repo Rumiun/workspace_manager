@@ -1,4 +1,6 @@
 var store = require('../../utils/store.js')
+var api = require('../../utils/api.js')
+var sync = require('../../utils/sync.js')
 var util = require('../../utils/util.js')
 var layout = require('../../utils/layout.js')
 
@@ -69,9 +71,14 @@ Page(layout.wrap({
       confirmColor: '#f04438',
       success: function (res) {
         if (!res.confirm) return
-        store.cancelApp(e.currentTarget.dataset.id)
-        util.toast('已撤回', 'success')
-        self.render()
+        wx.showLoading({ title: '提交中…' })
+        api.cancelApp(e.currentTarget.dataset.id, store.getCurrentUser()).then(function (r) {
+          wx.hideLoading()
+          if (!r || !r.ok) return util.toast((r && r.msg) || '撤回失败')
+          util.toast('已撤回', 'success')
+          // 服务端为准：撤回后以服务端最新申请列表重渲染
+          sync.refresh().then(function () { self.render() })
+        })
       }
     })
   }
