@@ -233,6 +233,49 @@ module.exports = {
     return http('POST', '/api/apps', { studentId: user.id, studentName: user.name, seatToken: token, reason: reason })
   },
 
+  /**
+   * 申请列表：服务端为准。
+   * 管理员不传 studentId（看全部）；学生必须传自己的号，由服务端过滤。
+   */
+  getApps: function (params) {
+    var query = []
+    if (params && params.studentId) query.push('studentId=' + enc(params.studentId))
+    if (params && params.status) query.push('status=' + enc(params.status))
+    if (config.USE_MOCK) {
+      var list = params && params.studentId ? store.getMyApps(params.studentId) : store.getApps()
+      if (params && params.status) list = list.filter(function (a) { return a.status === params.status })
+      return mock({ ok: true, list: list })
+    }
+    return http('GET', '/api/apps' + (query.length ? '?' + query.join('&') : ''))
+  },
+
+  /** 审批：pass=true 同意并分配工位，false 驳回 */
+  handleApp: function (id, pass, user, comment) {
+    if (config.USE_MOCK) {
+      return mock(store.handleApp(id, pass, (user && user.name) || '管理员', comment || ''))
+    }
+    return http('POST', '/api/apps/' + enc(id) + '/handle', {
+      pass: !!pass,
+      handler: (user && user.name) || '管理员',
+      comment: comment || '',
+      studentId: user && user.id,
+      role: user && user.role
+    })
+  },
+
+  /** 学生撤回自己的申请（仅待审批可撤，服务端会校验归属） */
+  cancelApp: function (id, user) {
+    if (config.USE_MOCK) {
+      store.cancelApp(id)
+      return mock({ ok: true })
+    }
+    return http('POST', '/api/apps/' + enc(id) + '/cancel', {
+      studentId: user && user.id,
+      name: user && user.name,
+      role: user && user.role
+    })
+  },
+
   /* ---------------- 办公室 ---------------- */
   getOffices: function () {
     if (config.USE_MOCK) return mock({ ok: true, list: store.getOffices() })

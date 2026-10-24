@@ -1177,6 +1177,80 @@ function cancelApp(id) {
   saveApps(apps)
 }
 
+/* ---------------- 服务端快照 ---------------- */
+
+/**
+ * 把服务端返回的数据整体写进本地缓存。
+ *
+ * 本地缓存只作「渲染缓冲区」，服务端才是唯一数据源：
+ * 页面进一次就拉一次快照覆盖这里，任何在别处发生过的修改都会同步过来。
+ * 返回是否有变化，便于调用方决定要不要重渲染。
+ *
+ * @param {{offices?:Array, seats?:Array, students?:Array, apps?:Array, settings?:Object}} payload
+ * @returns {boolean} 内容与上次不一致时为 true
+ */
+function applyServerSnapshot(payload) {
+  var data = payload || {}
+  var before = [
+    JSON.stringify(read(KEY.OFFICES, [])),
+    JSON.stringify(read(KEY.SEATS, [])),
+    JSON.stringify(read(KEY.STUDENTS, [])),
+    JSON.stringify(read(KEY.APPS, [])),
+    JSON.stringify(read(KEY.SETTINGS, {}))
+  ].join('|')
+  var touched = false
+
+  if (data.offices && data.offices.length) {
+    write(KEY.OFFICES, data.offices.map(function (o) {
+      return {
+        id: o.id,
+        name: o.name || '',
+        building: o.building || '',
+        prefix: String(o.prefix || '').toUpperCase(),
+        rows: Math.max(1, parseInt(o.rows, 10) || 1),
+        cols: Math.max(1, parseInt(o.cols, 10) || 1),
+        mapMode: o.mapMode === 'custom' ? 'custom' : 'grid',
+        mapImage: o.mapImage || '',
+        mapPoints: (o.mapPoints || []).slice()
+      }
+    }))
+    touched = true
+  }
+  if (data.seats && data.seats.length) {
+    write(KEY.SEATS, data.seats.map(function (s) {
+      return Object.assign({}, s, {
+        row: parseInt(s.row, 10) || 1,
+        col: parseInt(s.col, 10) || 1,
+        zone: s.zone || String(s.prefix || '')
+      })
+    }))
+    touched = true
+  }
+  if (data.students && data.students.length) {
+    write(KEY.STUDENTS, data.students)
+    touched = true
+  }
+  /* 申请列表允许是空数组（服务端确实没有申请），所以只判断存在性 */
+  if (data.apps) {
+    write(KEY.APPS, data.apps)
+    touched = true
+  }
+  if (data.settings && Object.keys(data.settings).length) {
+    write(KEY.SETTINGS, Object.assign({}, getSettings(), data.settings))
+    touched = true
+  }
+  if (!touched) return false
+
+  var after = [
+    JSON.stringify(read(KEY.OFFICES, [])),
+    JSON.stringify(read(KEY.SEATS, [])),
+    JSON.stringify(read(KEY.STUDENTS, [])),
+    JSON.stringify(read(KEY.APPS, [])),
+    JSON.stringify(read(KEY.SETTINGS, {}))
+  ].join('|')
+  return after !== before
+}
+
 /* ---------------- 公告与统计 ---------------- */
 function getNotices() {
   return read(KEY.NOTICES, [])
@@ -1277,5 +1351,6 @@ module.exports = {
   getNotices: getNotices,
   addNotice: addNotice,
   getStats: getStats,
-  resetAll: resetAll
+  resetAll: resetAll,
+  applyServerSnapshot: applyServerSnapshot
 }

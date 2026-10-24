@@ -146,6 +146,8 @@ function fallbackLayout() {
   return detect()
 }
 
+var sync = require('./sync.js')
+
 /* ============ 电脑版 UI 的启用范围与版本选择 ============
    默认：无论手机还是电脑登录，所有页面一律手机版。
    切换：仅管理员可用。管理员在首页用户卡片右上角的下拉菜单选「电脑版页面」后，
@@ -289,7 +291,14 @@ function activeLayout() {
   return layout
 }
 
-/** 页面混入：注入 isWide / isPC / isPad 等（均为「当前页是否启用电脑版 UI」的结果）与画布尺寸 */
+/**
+ * 页面混入：注入 isWide / isPC / isPad 等页面数据与画布尺寸
+ *
+ * 同时接管「服务端数据同步」：页面每次显示都向服务端拉一次快照覆盖本地缓存，
+ * 数据有变化时自动重新渲染，因此各页面读到的永远是服务端的最新结果。
+ *
+ * 页面可用 noServerSync: true 关闭（例如地图编辑器自带服务端拉取逻辑）。
+ */
 function wrap(page) {
   var apply = function (self) {
     // 布局计算异常不能拖垮页面 onLoad / onShow（否则页面数据停在初始值，
@@ -317,9 +326,31 @@ function wrap(page) {
   }
   page.onShow = function () {
     apply(this)
-    if (originShow) return originShow.apply(this, arguments)
+    if (originShow) originShow.apply(this, arguments)
+    if (page.noServerSync) return
+    // 服务端为准：本次显示后拉一次快照，数据有变化就重渲染
+    var self = this
+    sync.pull().then(function (changed) {
+      if (changed) rerender(self)
+    })
   }
   return page
+}
+
+/**
+ * 服务端数据到达后触发页面重渲染：
+ * 页面自己实现了 onServerUpdate 的优先使用，否则退回无参的 refresh / render / load，
+ * 有参数的渲染方法（如 home.load(user)）不会被误调用。
+ */
+function rerender(self) {
+  try {
+    if (typeof self.onServerUpdate === 'function') return self.onServerUpdate.call(self)
+    var names = ['refresh', 'render', 'load']
+    for (var i = 0; i < names.length; i++) {
+      var fn = self[names[i]]
+      if (typeof fn === 'function' && fn.length === 0) return fn.call(self)
+    }
+  } catch (e) {}
 }
 
 module.exports = {
