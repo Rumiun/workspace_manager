@@ -1,0 +1,16 @@
+{
+  "name": "gss-seat-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "研究生工位登记服务端（零框架 Node HTTP 服务）",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "optionalDependencies": {
+    "mysql2": "^3.11.0"
+  }
+}
