@@ -1,9 +1,21 @@
 # 自有 Ubuntu 服务器部署（不使用云托管）
 
-文件只有 4 个：`index.js`、`storage.js`、`package.json`、`ecosystem.config.js`
-（外加 `nginx-seat.conf` 示例、`install.sh` 一键脚本、`backup.sh` 备份脚本）。
+核心文件只有 4 个：`index.js`、`storage.js`、`package.json`、`ecosystem.config.js`
+（外加 `nginx-seat.conf` 示例、`install.sh` 一键部署、`update.sh` 一键更新、`backup.sh` 备份脚本）。
 
-## 放到服务器上
+## 本次更新内容（v1.1.0）
+
+服务端适配「以服务端为准」的数据模型，新增两个接口，供小程序不用本地缓存就能读申请数据：
+
+| 接口 | 说明 |
+| --- | --- |
+| `GET /api/apps?studentId=&status=` | 申请列表；不带 studentId 返回全部（管理员），带上只返回该学生的 |
+| `POST /api/apps/:id/cancel` | 学生撤回自己的申请（服务端校验归属，别人撤回返回 403） |
+
+其余接口不变；老版本的服务端没有这两个接口，小程序「我的记录 / 审批」页会读不到服务端数据，
+所以**必须更新服务端**。
+
+## 新装：放到服务器上
 
 ```bash
 # 服务器上先建目录
@@ -22,6 +34,23 @@ scp F:\program\run\vps\* root@服务器IP:/opt/seat-server/
 ssh root@服务器IP
 cd /opt/seat-server && sudo bash install.sh
 ```
+
+## 已装过的服务器：一键更新
+
+```bash
+sudo bash /opt/seat-server/update.sh
+```
+
+脚本会自动：git 拉最新代码 → 备份 `data/` → 只覆盖代码文件 → `pm2 restart` → 打印日志与接口自检结果。
+代码目录自动识别（优先 `server/`，回退 `vps/`），**业务数据 `data/` 不会被覆盖**。
+
+没有用 Git 的服务器，手动更新同样一句：
+
+```bash
+cd /opt/seat-server && pm2 restart seat
+```
+
+（先把本包的 `index.js`、`storage.js` 覆盖过去即可。）
 
 ## 手动启动（不用脚本时）
 

@@ -299,6 +299,24 @@ function createApp(body) {
   })
 }
 
+/**
+ * 学生撤回自己的申请（仅待审批状态可撤回，通过后请走「退订工位」）
+ * @param {string} id
+ * @param {{studentId?:string}} user
+ */
+function cancelApp(id, user) {
+  return transaction(() => {
+    const app = state.apps.find(a => a.id === id)
+    if (!app) return fail(404, 'NOT_FOUND', '申请不存在')
+    if (user && user.studentId && app.studentId !== user.studentId) {
+      return fail(403, 'FORBIDDEN', '只能撤回自己的申请')
+    }
+    if (app.status !== 'pending') return fail(409, 'HANDLED', '该申请已处理，无法撤回')
+    state.apps = state.apps.filter(a => a.id !== id)
+    return ok({ app })
+  })
+}
+
 function handleApp(id, pass, handlerName, comment) {
   return transaction(() => {
     const app = state.apps.find(a => a.id === id)
@@ -558,6 +576,18 @@ const server = http.createServer(async (req, res) => {
     if (seg[1] === 'apps' && seg[2] && seg[3] === 'handle' && req.method === 'POST') {
       const r = await handleApp(decodeURIComponent(seg[2]), !!body.pass, body.handler || '管理员', body.comment || '')
       return send(res, r.status, r.body)
+    }
+    if (seg[1] === 'apps' && seg[2] && seg[3] === 'cancel' && req.method === 'POST') {
+      const r = await cancelApp(decodeURIComponent(seg[2]), user)
+      return send(res, r.status, r.body)
+    }
+    if (seg[1] === 'apps' && !seg[2] && req.method === 'GET') {
+      const studentId = url.searchParams.get('studentId') || ''
+      const status = url.searchParams.get('status') || ''
+      let list = state.apps
+      if (studentId) list = list.filter(a => a.studentId === studentId)
+      if (status) list = list.filter(a => a.status === status)
+      return send(res, 200, { ok: true, list: list })
     }
     if (seg[1] === 'apps' && !seg[2] && req.method === 'POST') {
       const r = await createApp(body)
