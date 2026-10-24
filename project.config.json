@@ -19,8 +19,9 @@
     "minifyWXML": true,
     "localPlugins": false,
     "disableUseStrict": false,
-    "condition": false
-  },
+    "condition": false,
+    "urlCheck": false
+    },
   "compileType": "miniprogram",
   "simulatorPluginLibVersion": {},
   "packOptions": {
